@@ -26,6 +26,8 @@ function wrapper({ children }: { children: React.ReactNode }) {
 }
 
 beforeEach(() => {
+  mockFrom.mockClear()
+  mockInsert.mockClear()
   mockFrom.mockReturnValue({ insert: mockInsert })
   mockInsert.mockReturnValue({ error: null })
 })
