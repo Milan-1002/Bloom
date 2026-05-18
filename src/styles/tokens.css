@@ -1,0 +1,206 @@
+/* Bloom design tokens — cool slate-blue, clinical-but-friendly */
+:root {
+  /* ── Brand palette: Slate (default) ────────────────────────── */
+  --b-bg: #EEF2F5;
+  --b-surface: #FFFFFF;
+  --b-surface-2: #F5F8FA;
+  --b-surface-sunken: #E5ECF1;
+
+  --b-ink: #1B2A3A;          /* primary text */
+  --b-ink-2: #36495C;        /* secondary text */
+  --b-ink-3: #6B7E91;        /* tertiary text */
+  --b-ink-4: #9EAEBC;        /* faint */
+  --b-hairline: #D9E2E9;
+
+  --b-primary: #1F3A4D;      /* deep slate navy */
+  --b-primary-ink: #FFFFFF;
+  --b-primary-soft: #E4ECF1;
+
+  --b-accent: #4E84A4;       /* slate blue accent */
+  --b-accent-soft: #DCE8EF;
+
+  --b-mint: #7CA994;         /* success / on-track */
+  --b-mint-soft: #DCE9E3;
+  --b-coral: #E08A6F;        /* warning / off-target */
+  --b-coral-soft: #F3DDD3;
+  --b-berry: #B86B82;        /* cycle / period */
+  --b-berry-soft: #EFD8DE;
+  --b-amber: #D9A24A;        /* caution / amber */
+  --b-amber-soft: #F2E2C7;
+
+  /* macro chips */
+  --b-protein: #4E84A4;
+  --b-carbs:   #D9A24A;
+  --b-fat:     #B86B82;
+  --b-fiber:   #7CA994;
+
+  /* shape */
+  --b-r-xs: 8px;
+  --b-r-sm: 12px;
+  --b-r-md: 18px;
+  --b-r-lg: 26px;
+  --b-r-xl: 32px;
+  --b-r-pill: 999px;
+
+  /* shadow */
+  --b-shadow-card: 0 1px 2px rgba(27,42,58,.04), 0 8px 24px rgba(27,42,58,.06);
+  --b-shadow-pop:  0 4px 12px rgba(27,42,58,.08), 0 24px 60px rgba(27,42,58,.12);
+
+  /* type */
+  --b-font-body: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --b-font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+  --b-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ── Palette: Warm (peach + terracotta) ───────────────────────── */
+[data-palette="warm"] {
+  --b-bg: #FBF3EE;
+  --b-surface: #FFFFFF;
+  --b-surface-2: #FBF5F1;
+  --b-surface-sunken: #F2E4DA;
+  --b-ink: #3A2A22;
+  --b-ink-2: #614637;
+  --b-ink-3: #8C6A57;
+  --b-ink-4: #BFA290;
+  --b-hairline: #E6D4C5;
+  --b-primary: #C16D4A;
+  --b-primary-soft: #F4DCCD;
+  --b-accent: #D88A6B;
+  --b-accent-soft: #F5DBCC;
+  --b-mint: #8AA98F;
+  --b-mint-soft: #DDE7DC;
+  --b-coral: #C0563B;
+  --b-coral-soft: #F0C9BC;
+  --b-berry: #B26878;
+  --b-berry-soft: #ECD2D7;
+  --b-amber: #D9A24A;
+  --b-amber-soft: #F2E2C7;
+  --b-protein: #C16D4A;
+  --b-carbs:   #D9A24A;
+  --b-fat:     #B26878;
+  --b-fiber:   #8AA98F;
+}
+
+/* ── Palette: Sage (earthy wellness) ───────────────────────── */
+[data-palette="sage"] {
+  --b-bg: #EEF1EA;
+  --b-surface: #FFFFFF;
+  --b-surface-2: #F4F6F0;
+  --b-surface-sunken: #E0E6D6;
+  --b-ink: #232B22;
+  --b-ink-2: #3F4A38;
+  --b-ink-3: #6B7763;
+  --b-ink-4: #9AA590;
+  --b-hairline: #D4DAC8;
+  --b-primary: #4D6A47;
+  --b-primary-soft: #DDE5D6;
+  --b-accent: #7B9B66;
+  --b-accent-soft: #DCE7CD;
+  --b-mint: #6F9A7E;
+  --b-mint-soft: #D9E5DC;
+  --b-coral: #C97B5B;
+  --b-coral-soft: #F0D7C8;
+  --b-berry: #9B5D6E;
+  --b-berry-soft: #E2CCD2;
+  --b-amber: #C8954A;
+  --b-amber-soft: #EDDFC4;
+  --b-protein: #4D6A47;
+  --b-carbs:   #C8954A;
+  --b-fat:     #9B5D6E;
+  --b-fiber:   #7B9B66;
+}
+
+/* ── Dark mode (works with any palette) ─────────────────────── */
+[data-dark="true"] {
+  --b-bg: #0E1620;
+  --b-surface: #18222D;
+  --b-surface-2: #1F2B38;
+  --b-surface-sunken: #0B1219;
+  --b-ink: #E5ECF1;
+  --b-ink-2: #BFCBD6;
+  --b-ink-3: #8696A6;
+  --b-ink-4: #4F5E6D;
+  --b-hairline: #28384A;
+  --b-primary: #6FA8C2;
+  --b-primary-ink: #0E1620;
+  --b-primary-soft: #1F3242;
+  --b-accent: #7FB1CA;
+  --b-accent-soft: #213544;
+  --b-mint: #9AC9B0;
+  --b-mint-soft: #1E2E2A;
+  --b-coral: #EE9C82;
+  --b-coral-soft: #3B2520;
+  --b-berry: #D08AA0;
+  --b-berry-soft: #3A2530;
+  --b-amber: #EBBC72;
+  --b-amber-soft: #382B17;
+  --b-shadow-card: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.4);
+}
+
+/* ── Base reset & body ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+.bloom {
+  font-family: var(--b-font-body);
+  color: var(--b-ink);
+  background: var(--b-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv11', 'ss01';
+  letter-spacing: -0.005em;
+}
+.bloom h1, .bloom h2, .bloom h3, .bloom h4, .bloom p { margin: 0; }
+.bloom button { font-family: inherit; }
+
+/* helpers used across screens */
+.b-display { font-family: var(--b-font-display); font-weight: 400; letter-spacing: -0.01em; }
+.b-num { font-variant-numeric: tabular-nums; }
+.b-hide-img [data-bloom-photo] { display: none !important; }
+.b-hide-img [data-bloom-photo-bg] { background-image: none !important; }
+
+@import "tailwindcss";
+
+@theme inline {
+  --color-b-primary:      var(--b-primary);
+  --color-b-primary-ink:  var(--b-primary-ink);
+  --color-b-primary-soft: var(--b-primary-soft);
+  --color-b-accent:       var(--b-accent);
+  --color-b-accent-soft:  var(--b-accent-soft);
+  --color-b-bg:           var(--b-bg);
+  --color-b-surface:      var(--b-surface);
+  --color-b-surface-2:    var(--b-surface-2);
+  --color-b-surface-sunken: var(--b-surface-sunken);
+  --color-b-ink:          var(--b-ink);
+  --color-b-ink-2:        var(--b-ink-2);
+  --color-b-ink-3:        var(--b-ink-3);
+  --color-b-ink-4:        var(--b-ink-4);
+  --color-b-hairline:     var(--b-hairline);
+  --color-b-mint:         var(--b-mint);
+  --color-b-mint-soft:    var(--b-mint-soft);
+  --color-b-coral:        var(--b-coral);
+  --color-b-coral-soft:   var(--b-coral-soft);
+  --color-b-berry:        var(--b-berry);
+  --color-b-berry-soft:   var(--b-berry-soft);
+  --color-b-amber:        var(--b-amber);
+  --color-b-amber-soft:   var(--b-amber-soft);
+  --color-b-protein:      var(--b-protein);
+  --color-b-carbs:        var(--b-carbs);
+  --color-b-fat:          var(--b-fat);
+  --color-b-fiber:        var(--b-fiber);
+
+  /* Border radius tokens */
+  --radius-b-xs:   var(--b-r-xs);
+  --radius-b-sm:   var(--b-r-sm);
+  --radius-b-md:   var(--b-r-md);
+  --radius-b-lg:   var(--b-r-lg);
+  --radius-b-xl:   var(--b-r-xl);
+  --radius-b-pill: var(--b-r-pill);
+
+  /* Shadow tokens */
+  --shadow-b-card: var(--b-shadow-card);
+  --shadow-b-pop:  var(--b-shadow-pop);
+
+  /* Font tokens */
+  --font-body:    var(--b-font-body);
+  --font-display: var(--b-font-display);
+  --font-mono:    var(--b-font-mono);
+}
