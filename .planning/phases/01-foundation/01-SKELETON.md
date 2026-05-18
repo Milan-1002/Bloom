@@ -2,7 +2,7 @@
 
 **Recorded:** 2026-05-18
 **Phase:** 01-Foundation
-**Status:** Implementation complete — pending smoke test (Task 4)
+**Status:** VERIFIED 2026-05-18 — full walking skeleton smoke test passed
 
 ---
 
@@ -199,4 +199,4 @@ Run after plan 01-05 executes. Check off each item:
 ---
 
 *Walking Skeleton defined: 2026-05-18*
-*Verified: [date to be filled after smoke test]*
+*Verified: 2026-05-18 — sign up → verify → onboard → /home confirmed end-to-end*

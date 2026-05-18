@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Roadmap created — ROADMAP.md, STATE.md written; REQUIREMENTS.md traceability updated
-last_updated: "2026-05-18T18:18:17.174Z"
+stopped_at: "Phase 1 complete — Walking Skeleton verified 2026-05-18. Ready for Phase 2."
+last_updated: "2026-05-18T14:15:00.000Z"
 last_activity: 2026-05-18
 progress:
   total_phases: 4
-  completed_phases: 0
-  total_plans: 5
-  completed_plans: 1
-  percent: 0
+  completed_phases: 1
+  total_plans: 14
+  completed_plans: 5
+  percent: 36
 ---
 
 # Project State
@@ -21,57 +21,64 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** A woman with PCOS can understand how today's food choices affect her insulin balance and symptoms — and receive a personalized, actionable target for the day.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Core Loop (Food Logging + Today Dashboard)
 
 ## Current Position
 
-Phase: 1 of 4 (Foundation)
-Plan: 1 of 5 in current phase
-Status: Ready to execute
+Phase: 2 of 4 (Core Loop — Food Logging + Today Dashboard)
+Plan: 0 of 5 in current phase
+Status: Ready to start
 Last activity: 2026-05-18
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 36%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 5
+- Average duration: ~18 minutes/plan
+- Total execution time: ~90 minutes (Phase 1)
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 0/5 | — | — |
-| 2. Food Logging + Dashboard | 0/5 | — | — |
+| 1. Foundation | 5/5 | ~90 min | ~18 min |
+| 2. Core Loop — Food Logging + Today Dashboard | 0/5 | — | — |
 | 3. Health Tracking | 0/2 | — | — |
 | 4. AI Targets | 0/2 | — | — |
-
-**Recent Trend:** No data yet
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+- Phase 1 complete: Walking Skeleton verified end-to-end (sign up → verify → onboard → /home)
+- Tailwind v4 CSS-first with @theme inline {} — no tailwind.config.ts
+- Supabase singleton in src/lib/supabase.ts — only createClient() call
+- RLS on all user tables using (select auth.uid()) — never bare auth.uid()
+- profiles row via trigger (handle_new_user) — no INSERT policy for authenticated role
+- log_date date column on weight_logs/symptom_logs — date(timestamptz) is not IMMUTABLE in PG indexes
+- AuthProvider returns null while loading — prevents flash-redirect
+- RequireProfile checks pcos_type from DB — localStorage cannot bypass guard
+- delete-account Edge Function — service role key in Deno.env only
+- z.preprocess for optional number fields — z.coerce.number().optional() coerces '' to 0
 
-- Initialization: Web PWA over native app — validate core value first
-- Initialization: USDA FoodData Central for food data — free tier, rate limits acceptable
-- Initialization: Claude API via Edge Function only — API key never in Vite env files
-- Initialization: Supabase singleton client — never instantiated in component render
+### Phase 2 Entry Conditions Met
+
+- [x] All Supabase tables exist (food_logs, usda_foods live in DB)
+- [x] AppLayout tab bar extensible (add Food tab in Phase 2)
+- [x] HomeScreen is empty state placeholder ready to replace
+- [x] Supabase singleton client typed and working
+- [x] TanStack Query set up (add food_logs queries)
+- [x] Auth + profile guard confirmed working
 
 ### Pending Todos
 
-None yet.
-
-### Blockers/Concerns
-
-- GI database licensing for gl.ts local table — Sydney University GI database commercial status unclear (resolve before Phase 2)
+- GI database licensing for gl.ts local table — Sydney University GI database commercial status unclear (resolve before Phase 2 Plan 01)
 - HIPAA exposure — likely not a covered entity, but requires attorney confirmation before production data stored
 - iOS Safari barcode scan confidence is MEDIUM — fallback to manual entry must be first-class UX
+- Replace placeholder PWA icons (1×1 px) with real Bloom brand icons before production
 
 ## Deferred Items
 
@@ -82,9 +89,11 @@ None yet.
 | v2 | Insights (INSG-01–03) | Deferred | Init |
 | v2 | Coach features (COACH-01–03) | Deferred | Init |
 | v2 | Food library enhancements (FOOD-11–13) | Deferred | Init |
+| prod | PWA icons (real brand assets) | Deferred | 01-05 |
 
 ## Session Continuity
 
-Last session: 2026-05-18T18:18:17.164Z
-Stopped at: Roadmap created — ROADMAP.md, STATE.md written; REQUIREMENTS.md traceability updated
+Last session: 2026-05-18
+Stopped at: Phase 1 complete — 5/5 plans done, skeleton verified
 Resume file: None
+Next action: Begin Phase 2 — /gsd:discuss-phase 2 or /gsd:plan-phase 02-01

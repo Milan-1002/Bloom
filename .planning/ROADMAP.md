@@ -7,7 +7,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** - Scaffold, auth, onboarding, database schema + RLS, design system, PWA
+- [x] **Phase 1: Foundation** - Scaffold, auth, onboarding, database schema + RLS, design system, PWA *(completed 2026-05-18)*
 - [ ] **Phase 2: Core Loop — Food Logging + Today Dashboard** - USDA food search, GL calculation, food diary, dashboard
 - [ ] **Phase 3: Health Tracking — Symptoms + Weight** - Symptom logging, weight logging, dashboard integration
 - [ ] **Phase 4: AI Targets — Claude Edge Function + Insulin Balance** - Personalized macro targets, Insulin Balance score
@@ -28,14 +28,14 @@
   3. A new user completes all 4 onboarding steps (welcome, profile, PCOS type, goals) and cannot skip to the main app until the profile is saved
   4. The app installs as a PWA on mobile with the correct Bloom name, icon, and theme color
   5. A user can delete their account and all associated data from profile settings
-**Plans:** 1/5 plans executed
+**Plans:** 5/5 plans executed
 
 Plans:
 - [x] 01-01: Vite + React + TS scaffold, ESLint/Prettier config, design token CSS, component stubs
-- [ ] 01-02: Supabase project wiring — all table migrations, RLS policies, TypeScript type generation
-- [ ] 01-03: Auth flow — AuthContext singleton, AuthLayout, sign-up/login/reset screens, email verification
-- [ ] 01-04: Router shell — AppLayout, RequireAuth + RequireProfile guards, tab bar, route structure
-- [ ] 01-05: Onboarding flow — 4-step wizard, profile save, gate guard; PWA manifest + service worker; account deletion
+- [x] 01-02: Supabase project wiring — all table migrations, RLS policies, TypeScript type generation
+- [x] 01-03: Auth flow — AuthContext singleton, AuthLayout, sign-up/login/reset screens, email verification
+- [x] 01-04: Router shell — AppLayout, RequireAuth + RequireProfile guards, tab bar, route structure
+- [x] 01-05: Onboarding flow — 4-step wizard, profile save, gate guard; PWA manifest + service worker; account deletion
 
 ### Phase 2: Core Loop — Food Logging + Today Dashboard
 **Goal:** USDA food search + Supabase cache, GL calculation (src/lib/gl.ts with local GI table), food_logs INSERT with denormalized macros, Today dashboard (static targets until Phase 4 adds AI), Food Diary screen, barcode scan, recent foods, edit/delete log entries.
@@ -99,7 +99,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/5 | In Progress|  |
+| 1. Foundation | 5/5 | Complete | 2026-05-18 |
 | 2. Core Loop — Food Logging + Today Dashboard | 0/5 | Not started | - |
 | 3. Health Tracking — Symptoms + Weight | 0/2 | Not started | - |
 | 4. AI Targets — Claude Edge Function + Insulin Balance | 0/2 | Not started | - |
