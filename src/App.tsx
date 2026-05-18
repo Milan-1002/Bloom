@@ -17,9 +17,8 @@ import { OnboardingPCOSScreen } from '@/screens/onboarding/OnboardingPCOSScreen'
 import { OnboardingDoneScreen } from '@/screens/onboarding/OnboardingDoneScreen'
 import { ProfileScreen } from '@/screens/profile/ProfileScreen'
 import { FoodSearchScreen } from '@/screens/logging/FoodSearchScreen'
+import { FoodDetailScreen } from '@/screens/logging/FoodDetailScreen'
 
-// Implemented in plan 02-02
-const FoodDetailScreen = () => null
 // Implemented in plan 02-03
 const BarcodeScanScreen = () => null
 
