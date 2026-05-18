@@ -18,9 +18,7 @@ import { OnboardingDoneScreen } from '@/screens/onboarding/OnboardingDoneScreen'
 import { ProfileScreen } from '@/screens/profile/ProfileScreen'
 import { FoodSearchScreen } from '@/screens/logging/FoodSearchScreen'
 import { FoodDetailScreen } from '@/screens/logging/FoodDetailScreen'
-
-// Implemented in plan 02-03
-const BarcodeScanScreen = () => null
+import { BarcodeScanScreen } from '@/screens/logging/BarcodeScanScreen'
 
 function App() {
   return (
