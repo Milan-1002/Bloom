@@ -10,6 +10,7 @@ interface ChipProps {
   size?: ChipSize
   icon?: ReactNode
   className?: string
+  onClick?: () => void
 }
 
 const toneClasses: Record<ChipTone, string> = {
@@ -28,9 +29,11 @@ const sizeClasses: Record<ChipSize, string> = {
   md: 'px-2.5 py-1.5 text-xs',
 }
 
-export function Chip({ children, tone = 'neutral', size = 'md', icon, className }: ChipProps) {
+export function Chip({ children, tone = 'neutral', size = 'md', icon, className, onClick }: ChipProps) {
+  const Tag = onClick ? 'button' : 'span'
   return (
-    <span
+    <Tag
+      onClick={onClick}
       className={clsx(
         'inline-flex items-center gap-1 rounded-b-pill font-semibold tracking-tight',
         toneClasses[tone],
@@ -40,6 +43,6 @@ export function Chip({ children, tone = 'neutral', size = 'md', icon, className 
     >
       {icon}
       {children}
-    </span>
+    </Tag>
   )
 }

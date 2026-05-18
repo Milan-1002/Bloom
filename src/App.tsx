@@ -11,13 +11,11 @@ import { CheckInboxScreen } from '@/screens/auth/CheckInboxScreen'
 import { ResetPasswordScreen } from '@/screens/auth/ResetPasswordScreen'
 import { AuthCallbackScreen } from '@/screens/auth/AuthCallbackScreen'
 import { HomeScreen } from '@/screens/home/HomeScreen'
-
-// Implemented in plan 01-05
-const OnboardingWelcomeScreen = () => null
-const OnboardingProfileScreen = () => null
-const OnboardingPCOSScreen = () => null
-const OnboardingDoneScreen = () => null
-const ProfileScreen = () => null
+import { OnboardingWelcomeScreen } from '@/screens/onboarding/OnboardingWelcomeScreen'
+import { OnboardingProfileScreen } from '@/screens/onboarding/OnboardingProfileScreen'
+import { OnboardingPCOSScreen } from '@/screens/onboarding/OnboardingPCOSScreen'
+import { OnboardingDoneScreen } from '@/screens/onboarding/OnboardingDoneScreen'
+import { ProfileScreen } from '@/screens/profile/ProfileScreen'
 
 function App() {
   return (

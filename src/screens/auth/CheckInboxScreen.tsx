@@ -67,7 +67,7 @@ export function CheckInboxScreen() {
         )}
 
         <Btn
-          tone="base"
+          tone="ghost"
           size="lg"
           full
           disabled={cooldown > 0}

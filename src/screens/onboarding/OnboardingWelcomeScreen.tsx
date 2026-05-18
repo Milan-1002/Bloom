@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useOnboardingStore } from '@/stores/onboardingStore'
 
 function BloomMark({ size = 26 }: { size?: number }) {
   return (
@@ -14,12 +15,17 @@ function BloomMark({ size = 26 }: { size?: number }) {
   )
 }
 
-export function WelcomeScreen() {
+export function OnboardingWelcomeScreen() {
   const navigate = useNavigate()
+  const { setStep } = useOnboardingStore()
+
+  const handleStart = () => {
+    setStep(1)
+    navigate('/onboarding/profile')
+  }
 
   return (
     <div className="relative flex h-dvh flex-col overflow-hidden bg-b-primary">
-      {/* Hero image + gradient overlay */}
       <div className="absolute inset-0">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -37,7 +43,6 @@ export function WelcomeScreen() {
         />
       </div>
 
-      {/* Wordmark */}
       <div className="absolute left-0 right-0 top-7 flex justify-center">
         <div className="flex items-center gap-2 text-white">
           <BloomMark size={26} />
@@ -45,7 +50,6 @@ export function WelcomeScreen() {
         </div>
       </div>
 
-      {/* Bottom content */}
       <div className="absolute bottom-0 left-0 right-0 px-6 pb-10 text-white">
         <h1 className="font-display text-[38px] leading-tight tracking-tight">
           Nourish your
@@ -53,13 +57,13 @@ export function WelcomeScreen() {
           <em className="opacity-90">cycle</em>, gently.
         </h1>
         <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/75">
-          A PCOS-aware nutrition companion built around your body's signals.
+          Let's set up your personalized PCOS nutrition plan.
         </p>
 
         <div className="mt-7 flex flex-col gap-3">
           <button
             className="w-full rounded-b-pill bg-white py-3.5 text-base font-bold tracking-tight text-b-primary active:opacity-90"
-            onClick={() => navigate('/signup')}
+            onClick={handleStart}
           >
             Start my journey
           </button>
@@ -69,6 +73,13 @@ export function WelcomeScreen() {
           >
             I already have an account
           </button>
+        </div>
+
+        {/* Progress dots — step 1 active */}
+        <div className="mt-6 flex justify-center gap-1.5">
+          <div className="h-1.5 w-5 rounded-full bg-white" />
+          <div className="h-1.5 w-1.5 rounded-full bg-white/35" />
+          <div className="h-1.5 w-1.5 rounded-full bg-white/35" />
         </div>
       </div>
     </div>
