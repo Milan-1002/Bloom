@@ -16,6 +16,12 @@ import { OnboardingProfileScreen } from '@/screens/onboarding/OnboardingProfileS
 import { OnboardingPCOSScreen } from '@/screens/onboarding/OnboardingPCOSScreen'
 import { OnboardingDoneScreen } from '@/screens/onboarding/OnboardingDoneScreen'
 import { ProfileScreen } from '@/screens/profile/ProfileScreen'
+import { FoodSearchScreen } from '@/screens/logging/FoodSearchScreen'
+
+// Implemented in plan 02-02
+const FoodDetailScreen = () => null
+// Implemented in plan 02-03
+const BarcodeScanScreen = () => null
 
 function App() {
   return (
@@ -38,6 +44,15 @@ function App() {
             <Route path="/onboarding/profile" element={<OnboardingProfileScreen />} />
             <Route path="/onboarding/pcos" element={<OnboardingPCOSScreen />} />
             <Route path="/onboarding/done" element={<OnboardingDoneScreen />} />
+          </Route>
+
+          {/* Authenticated + profile complete: logging flow (full-screen, no tab bar) */}
+          <Route element={<RequireProfile />}>
+            <Route element={<AuthLayout />}>
+              <Route path="/log" element={<FoodSearchScreen />} />
+              <Route path="/log/detail/:fdcId" element={<FoodDetailScreen />} />
+              <Route path="/log/scan" element={<BarcodeScanScreen />} />
+            </Route>
           </Route>
 
           {/* Authenticated + profile complete: main app with tab bar */}
