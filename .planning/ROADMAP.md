@@ -28,10 +28,10 @@
   3. A new user completes all 4 onboarding steps (welcome, profile, PCOS type, goals) and cannot skip to the main app until the profile is saved
   4. The app installs as a PWA on mobile with the correct Bloom name, icon, and theme color
   5. A user can delete their account and all associated data from profile settings
-**Plans:** TBD
+**Plans:** 1/5 plans executed
 
 Plans:
-- [ ] 01-01: Vite + React + TS scaffold, ESLint/Prettier config, design token CSS, component stubs
+- [x] 01-01: Vite + React + TS scaffold, ESLint/Prettier config, design token CSS, component stubs
 - [ ] 01-02: Supabase project wiring — all table migrations, RLS policies, TypeScript type generation
 - [ ] 01-03: Auth flow — AuthContext singleton, AuthLayout, sign-up/login/reset screens, email verification
 - [ ] 01-04: Router shell — AppLayout, RequireAuth + RequireProfile guards, tab bar, route structure
@@ -99,7 +99,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/5 | Not started | - |
+| 1. Foundation | 1/5 | In Progress|  |
 | 2. Core Loop — Food Logging + Today Dashboard | 0/5 | Not started | - |
 | 3. Health Tracking — Symptoms + Weight | 0/2 | Not started | - |
 | 4. AI Targets — Claude Edge Function + Insulin Balance | 0/2 | Not started | - |

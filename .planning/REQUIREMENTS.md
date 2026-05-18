@@ -25,7 +25,7 @@
 ### Profile & Settings
 
 - [ ] **PROF-01**: User can view and edit their profile (name, age, height, weight, PCOS type, goals)
-- [ ] **PROF-02**: User can select app theme (slate, warm, sage palettes; light/dark mode)
+- [x] **PROF-02**: User can select app theme (slate, warm, sage palettes; light/dark mode)
 - [ ] **PROF-03**: User can delete their account and all associated data (GDPR right-to-erasure)
 
 ### Food Logging
@@ -81,7 +81,7 @@
 ### Infrastructure & Security
 
 - [ ] **INFRA-01**: All user-owned tables (food_logs, weight_logs, symptom_logs, profiles) have RLS enabled with `(select auth.uid()) = user_id` policies from migration 1
-- [ ] **INFRA-02**: Supabase client is a module-level singleton — never instantiated in component render
+- [x] **INFRA-02**: Supabase client is a module-level singleton — never instantiated in component render
 - [ ] **INFRA-03**: USDA API responses are cached in a shared `usda_foods` table (30-day TTL) to protect against the 1,000 req/hr rate limit
 - [ ] **INFRA-04**: TypeScript database types are generated from schema (`supabase gen types typescript`) and committed
 - [ ] **INFRA-05**: PWA manifest and service worker are configured (Vite PWA plugin, `generateSW` strategy)
@@ -151,10 +151,10 @@ Deferred — not in current roadmap.
 | ONBD-03 | Phase 1 — Foundation | Pending |
 | ONBD-04 | Phase 1 — Foundation | Pending |
 | PROF-01 | Phase 1 — Foundation | Pending |
-| PROF-02 | Phase 1 — Foundation | Pending |
+| PROF-02 | Phase 1 — Foundation | Complete |
 | PROF-03 | Phase 1 — Foundation | Pending |
 | INFRA-01 | Phase 1 — Foundation | Pending |
-| INFRA-02 | Phase 1 — Foundation | Pending |
+| INFRA-02 | Phase 1 — Foundation | Complete |
 | INFRA-03 | Phase 1 — Foundation | Pending |
 | INFRA-04 | Phase 1 — Foundation | Pending |
 | INFRA-05 | Phase 1 — Foundation | Pending |
