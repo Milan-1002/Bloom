@@ -2,7 +2,7 @@
 
 **Recorded:** 2026-05-18
 **Phase:** 01-Foundation
-**Status:** Defined pre-execution — update to "Verified" after smoke test passes
+**Status:** Implementation complete — pending smoke test (Task 4)
 
 ---
 
