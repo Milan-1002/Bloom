@@ -139,29 +139,65 @@ Deferred — not in current roadmap.
 
 ## Traceability
 
-Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01–05 | Phase 1 | Pending |
-| ONBD-01–04 | Phase 1 | Pending |
-| INFRA-01–06 | Phase 1 | Pending |
-| PROF-01–03 | Phase 1 | Pending |
-| FOOD-01–05 | Phase 2 | Pending |
-| FOOD-06 | Phase 2 | Pending |
-| FOOD-07–10 | Phase 2 | Pending |
-| DASH-01–07 | Phase 2 | Pending |
-| DIARY-01–03 | Phase 2 | Pending |
-| SYMPT-01–03 | Phase 3 | Pending |
-| WGHT-01–03 | Phase 3 | Pending |
-| AI-01–06 | Phase 4 | Pending |
+| AUTH-01 | Phase 1 — Foundation | Pending |
+| AUTH-02 | Phase 1 — Foundation | Pending |
+| AUTH-03 | Phase 1 — Foundation | Pending |
+| AUTH-04 | Phase 1 — Foundation | Pending |
+| AUTH-05 | Phase 1 — Foundation | Pending |
+| ONBD-01 | Phase 1 — Foundation | Pending |
+| ONBD-02 | Phase 1 — Foundation | Pending |
+| ONBD-03 | Phase 1 — Foundation | Pending |
+| ONBD-04 | Phase 1 — Foundation | Pending |
+| PROF-01 | Phase 1 — Foundation | Pending |
+| PROF-02 | Phase 1 — Foundation | Pending |
+| PROF-03 | Phase 1 — Foundation | Pending |
+| INFRA-01 | Phase 1 — Foundation | Pending |
+| INFRA-02 | Phase 1 — Foundation | Pending |
+| INFRA-03 | Phase 1 — Foundation | Pending |
+| INFRA-04 | Phase 1 — Foundation | Pending |
+| INFRA-05 | Phase 1 — Foundation | Pending |
+| INFRA-06 | Phase 1 — Foundation | Pending |
+| FOOD-01 | Phase 2 — Core Loop | Pending |
+| FOOD-02 | Phase 2 — Core Loop | Pending |
+| FOOD-03 | Phase 2 — Core Loop | Pending |
+| FOOD-04 | Phase 2 — Core Loop | Pending |
+| FOOD-05 | Phase 2 — Core Loop | Pending |
+| FOOD-06 | Phase 2 — Core Loop | Pending |
+| FOOD-07 | Phase 2 — Core Loop | Pending |
+| FOOD-08 | Phase 2 — Core Loop | Pending |
+| FOOD-09 | Phase 2 — Core Loop | Pending |
+| FOOD-10 | Phase 2 — Core Loop | Pending |
+| DASH-01 | Phase 2 — Core Loop | Pending |
+| DASH-02 | Phase 2 — Core Loop | Pending |
+| DASH-03 | Phase 2 — Core Loop | Pending |
+| DASH-04 | Phase 2 — Core Loop | Pending |
+| DASH-05 | Phase 2 — Core Loop | Pending |
+| DASH-06 | Phase 2 — Core Loop | Pending |
+| DASH-07 | Phase 2 — Core Loop | Pending |
+| DIARY-01 | Phase 2 — Core Loop | Pending |
+| DIARY-02 | Phase 2 — Core Loop | Pending |
+| DIARY-03 | Phase 2 — Core Loop | Pending |
+| SYMPT-01 | Phase 3 — Health Tracking | Pending |
+| SYMPT-02 | Phase 3 — Health Tracking | Pending |
+| SYMPT-03 | Phase 3 — Health Tracking | Pending |
+| WGHT-01 | Phase 3 — Health Tracking | Pending |
+| WGHT-02 | Phase 3 — Health Tracking | Pending |
+| WGHT-03 | Phase 3 — Health Tracking | Pending |
+| AI-01 | Phase 4 — AI Targets | Pending |
+| AI-02 | Phase 4 — AI Targets | Pending |
+| AI-03 | Phase 4 — AI Targets | Pending |
+| AI-04 | Phase 4 — AI Targets | Pending |
+| AI-05 | Phase 4 — AI Targets | Pending |
+| AI-06 | Phase 4 — AI Targets | Pending |
 
 **Coverage:**
-- v1 requirements: 46 total
-- Mapped to phases: 46
+- v1 requirements: 50 total
+- Mapped to phases: 50
 - Unmapped: 0 ✓
 
 ---
 
 *Requirements defined: 2026-05-18*
-*Last updated: 2026-05-18 after initial scoping*
+*Last updated: 2026-05-18 — traceability updated after roadmap creation*
