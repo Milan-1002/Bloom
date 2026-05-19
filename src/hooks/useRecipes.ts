@@ -13,6 +13,8 @@ export type Recipe = {
   carbs_g: number
   gl: number
   tags: string[]
+  ingredients: string[]
+  instructions: string[]
 }
 
 // Verified Unsplash photo IDs per recipe category
@@ -30,7 +32,7 @@ const PHOTO_BY_CATEGORY: Record<string, string> = {
 }
 const FALLBACK_PHOTO = '1546069901-ba9599a7e63c'
 
-function recipeImage(category: string, width = 480): string {
+export function recipeImage(category: string, width = 480): string {
   const id = PHOTO_BY_CATEGORY[category] ?? FALLBACK_PHOTO
   return `https://images.unsplash.com/photo-${id}?w=${width}&q=80&auto=format&fit=crop`
 }
@@ -45,6 +47,8 @@ type RawRecipe = {
   carbs_g: number
   gl: number
   tags: string[]
+  ingredients?: string[]
+  instructions?: string[]
 }
 
 function toRecipe(raw: RawRecipe, index: number): Recipe {
@@ -59,6 +63,8 @@ function toRecipe(raw: RawRecipe, index: number): Recipe {
     carbs_g: raw.carbs_g ?? 0,
     gl: raw.gl,
     tags: Array.isArray(raw.tags) ? raw.tags : [],
+    ingredients: Array.isArray(raw.ingredients) ? raw.ingredients : [],
+    instructions: Array.isArray(raw.instructions) ? raw.instructions : [],
   }
 }
 

@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppBar, Card, Chip } from '@/components/ui'
 import { useRecipes, type Recipe } from '@/hooks/useRecipes'
 
@@ -161,15 +162,19 @@ function CategoryTile({
 // ── Featured Card ─────────────────────────────────────────────────────────────
 
 function FeaturedCard({
-  recipe, isFaved, onFave, onAdd,
+  recipe, isFaved, onFave, onAdd, onTap,
 }: {
   recipe: Recipe
   isFaved: boolean
   onFave: () => void
   onAdd: () => void
+  onTap: () => void
 }) {
   return (
-    <div className="w-60 shrink-0 overflow-hidden rounded-b-md border border-b-hairline bg-b-surface shadow-b-card">
+    <button
+      onClick={onTap}
+      className="w-60 shrink-0 overflow-hidden rounded-b-md border border-b-hairline bg-b-surface shadow-b-card text-left active:opacity-90 transition-opacity"
+    >
       <div className="relative">
         <img src={recipe.image} alt={recipe.name} className="h-36 w-full object-cover" />
         <div className="absolute left-2.5 top-2.5">
@@ -179,7 +184,7 @@ function FeaturedCard({
           </span>
         </div>
         <button
-          onClick={onFave}
+          onClick={e => { e.stopPropagation(); onFave() }}
           className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 transition-transform active:scale-90"
           style={{ color: 'var(--b-coral)' }}
           aria-label={isFaved ? 'Remove from saved' : 'Save recipe'}
@@ -196,7 +201,7 @@ function FeaturedCard({
             <span>🔥 {recipe.kcal} kcal</span>
           </div>
           <button
-            onClick={onAdd}
+            onClick={e => { e.stopPropagation(); onAdd() }}
             className="flex h-7 w-7 items-center justify-center rounded-full bg-b-primary text-white transition-transform active:scale-90"
             aria-label="Add to plan"
           >
@@ -204,65 +209,68 @@ function FeaturedCard({
           </button>
         </div>
       </div>
-    </div>
+    </button>
   )
 }
 
 // ── Recipe List Row ───────────────────────────────────────────────────────────
 
 function RecipeListRow({
-  recipe, isFaved, onFave, onAdd,
+  recipe, isFaved, onFave, onAdd, onTap,
 }: {
   recipe: Recipe
   isFaved: boolean
   onFave: () => void
   onAdd: () => void
+  onTap: () => void
 }) {
   return (
-    <Card pad="sm" className="flex items-center gap-3">
-      <div className="relative shrink-0">
-        <img src={recipe.image} alt={recipe.name} className="h-16 w-16 rounded-xl object-cover" />
+    <button onClick={onTap} className="block w-full text-left active:opacity-90 transition-opacity">
+      <Card pad="sm" className="flex items-center gap-3">
+        <div className="relative shrink-0">
+          <img src={recipe.image} alt={recipe.name} className="h-16 w-16 rounded-xl object-cover" />
+          <button
+            onClick={e => { e.stopPropagation(); onFave() }}
+            className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-b-card transition-transform active:scale-90"
+            style={{ color: 'var(--b-coral)' }}
+            aria-label={isFaved ? 'Remove from saved' : 'Save recipe'}
+          >
+            <HeartIcon size={11} filled={isFaved} />
+          </button>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] font-bold leading-snug text-b-ink">{recipe.name}</p>
+          <div className="mt-1.5 flex items-center gap-2 text-[11px] font-semibold text-b-ink-3">
+            <span>⏱ {recipe.timeMin}m</span>
+            <span className="h-1 w-1 rounded-full bg-b-ink-4" />
+            <span>🔥 {recipe.kcal}</span>
+            <span className="h-1 w-1 rounded-full bg-b-ink-4" />
+            <span>P {recipe.protein_g}g</span>
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {recipe.tags.includes('low-gl') && (
+              <Chip size="sm" tone="mint" icon={<LeafIcon />}>Low GL</Chip>
+            )}
+            {recipe.tags.includes('high-protein') && (
+              <Chip size="sm" tone="primary">High protein</Chip>
+            )}
+            {recipe.tags.includes('high-fiber') && (
+              <Chip size="sm" tone="amber">High fiber</Chip>
+            )}
+            {recipe.tags.includes('anti-inflam') && (
+              <Chip size="sm" tone="accent">Anti-inflam</Chip>
+            )}
+          </div>
+        </div>
         <button
-          onClick={onFave}
-          className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-b-card transition-transform active:scale-90"
-          style={{ color: 'var(--b-coral)' }}
-          aria-label={isFaved ? 'Remove from saved' : 'Save recipe'}
+          onClick={e => { e.stopPropagation(); onAdd() }}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-b-primary text-white transition-transform active:scale-90"
+          aria-label="Add to plan"
         >
-          <HeartIcon size={11} filled={isFaved} />
+          <PlusIcon />
         </button>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-bold leading-snug text-b-ink">{recipe.name}</p>
-        <div className="mt-1.5 flex items-center gap-2 text-[11px] font-semibold text-b-ink-3">
-          <span>⏱ {recipe.timeMin}m</span>
-          <span className="h-1 w-1 rounded-full bg-b-ink-4" />
-          <span>🔥 {recipe.kcal}</span>
-          <span className="h-1 w-1 rounded-full bg-b-ink-4" />
-          <span>P {recipe.protein_g}g</span>
-        </div>
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          {recipe.tags.includes('low-gl') && (
-            <Chip size="sm" tone="mint" icon={<LeafIcon />}>Low GL</Chip>
-          )}
-          {recipe.tags.includes('high-protein') && (
-            <Chip size="sm" tone="primary">High protein</Chip>
-          )}
-          {recipe.tags.includes('high-fiber') && (
-            <Chip size="sm" tone="amber">High fiber</Chip>
-          )}
-          {recipe.tags.includes('anti-inflam') && (
-            <Chip size="sm" tone="accent">Anti-inflam</Chip>
-          )}
-        </div>
-      </div>
-      <button
-        onClick={onAdd}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-b-primary text-white transition-transform active:scale-90"
-        aria-label="Add to plan"
-      >
-        <PlusIcon />
-      </button>
-    </Card>
+      </Card>
+    </button>
   )
 }
 
@@ -278,6 +286,7 @@ const CATEGORIES: Array<{
 ]
 
 export function RecipesScreen() {
+  const navigate = useNavigate()
   const [activeFilter, setActiveFilter] = useState<Filter>('All')
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [showFavsOnly, setShowFavsOnly] = useState(false)
@@ -439,6 +448,7 @@ export function RecipesScreen() {
                       isFaved={favorites.has(r.id)}
                       onFave={() => toggleFave(r.id, r.name)}
                       onAdd={() => handleAdd(r.name)}
+                      onTap={() => navigate(`/recipes/${r.id}`)}
                     />
                   ))}
                 </div>
@@ -482,6 +492,7 @@ export function RecipesScreen() {
                       isFaved={favorites.has(r.id)}
                       onFave={() => toggleFave(r.id, r.name)}
                       onAdd={() => handleAdd(r.name)}
+                      onTap={() => navigate(`/recipes/${r.id}`)}
                     />
                   ))}
                 </div>

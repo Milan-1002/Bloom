@@ -22,6 +22,7 @@ import { FoodSearchScreen } from '@/screens/logging/FoodSearchScreen'
 import { FoodDetailScreen } from '@/screens/logging/FoodDetailScreen'
 import { BarcodeScanScreen } from '@/screens/logging/BarcodeScanScreen'
 import { RecipesScreen } from '@/screens/recipes/RecipesScreen'
+import { RecipeDetailScreen } from '@/screens/recipes/RecipeDetailScreen'
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
               <Route path="/diary" element={<DiaryScreen />} />
               <Route path="/symptoms" element={<SymptomsScreen />} />
               <Route path="/recipes" element={<RecipesScreen />} />
+              <Route path="/recipes/:recipeId" element={<RecipeDetailScreen />} />
               <Route path="/profile" element={<ProfileScreen />} />
             </Route>
           </Route>

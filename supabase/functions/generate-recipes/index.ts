@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Anthropic from 'https://esm.sh/@anthropic-ai/sdk'
 
 const CACHE_HOURS = 24
+const DATA_VERSION = 2 // bump when schema changes to bust stale cache
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -27,7 +28,9 @@ OUTPUT FORMAT — return ONLY a valid JSON object, no prose, no markdown:
       "fiber_g": <integer 1–22>,
       "carbs_g": <integer 5–75>,
       "gl": <integer 1–50>,
-      "tags": [<zero or more of: "low-gl", "high-protein", "high-fiber", "anti-inflam", "quick">]
+      "tags": [<zero or more of: "low-gl", "high-protein", "high-fiber", "anti-inflam", "quick">],
+      "ingredients": ["<quantity + ingredient>", ...],
+      "instructions": ["<full step text>", ...]
     }
   ]
 }
@@ -49,7 +52,10 @@ CATEGORY GUIDE (pick the most fitting):
 - toast: avocado toast, open-faced sandwiches
 - legumes: lentils, chickpeas, beans as hero ingredient
 - chicken: chicken-based dishes
-- pasta_alt: courgetti, shirataki, hearts of palm pasta`
+- pasta_alt: courgetti, shirataki, hearts of palm pasta
+
+INGREDIENTS: 6–10 items, each as "<quantity> <ingredient>" e.g. "2 cups cooked quinoa"
+INSTRUCTIONS: 4–7 clear numbered steps written in plain English. Each step should be one complete sentence or two short sentences.`
 
 interface RawRecipe {
   name: string
@@ -61,6 +67,8 @@ interface RawRecipe {
   carbs_g: number
   gl: number
   tags: string[]
+  ingredients: string[]
+  instructions: string[]
 }
 
 const anthropic = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY')! })
@@ -107,29 +115,33 @@ Deno.serve(async (req: Request) => {
         .maybeSingle(),
     ])
 
-    // Return cached if fresh
+    // Return cache only if it has the current data version (has instructions)
     if (cacheRes.data?.recipes) {
-      return new Response(
-        JSON.stringify({ recipes: cacheRes.data.recipes, source: 'cache' }),
-        { headers: jsonHeaders }
-      )
+      const cached = cacheRes.data.recipes as RawRecipe[]
+      const isCurrentVersion = cached.length > 0 && Array.isArray(cached[0].instructions)
+      if (isCurrentVersion) {
+        return new Response(
+          JSON.stringify({ recipes: cached, source: 'cache' }),
+          { headers: jsonHeaders }
+        )
+      }
     }
 
     const profile = profileRes.data
 
-    // Generate with Claude
     const userPrompt = [
       `PCOS type: ${profile?.pcos_type ?? 'not specified'}`,
       `Goals: ${profile?.goals?.length ? (profile.goals as string[]).join(', ') : 'general hormonal health'}`,
       '',
       'Generate exactly 12 PCOS-friendly recipes that support insulin balance and hormonal health.',
       'Include a variety of meal types: at least 2 bowls, 2 egg-based, 2 salads, 2 soups or stews, 2 stir-fries or pan dishes, and 2 others.',
-      'Ensure tags correctly reflect the nutritional values you set — do not add a tag if the value does not meet the threshold.',
+      'Every recipe MUST include both "ingredients" and "instructions" arrays with realistic content.',
+      'Tags must correctly reflect the nutritional values — never add a tag if the value does not meet the threshold.',
     ].join('\n')
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2048,
+      max_tokens: 6000,
       temperature: 0.7,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userPrompt }],
@@ -138,7 +150,6 @@ Deno.serve(async (req: Request) => {
     const text = message.content[0].type === 'text' ? message.content[0].text : ''
     if (!text) throw new Error('empty_response')
 
-    // Strip markdown code fences if present
     let jsonText = text.trim()
     if (jsonText.startsWith('```')) {
       jsonText = jsonText.replace(/^```(?:json)?\r?\n?/, '').replace(/\r?\n?```$/, '').trim()
@@ -152,7 +163,8 @@ Deno.serve(async (req: Request) => {
     const recipes = parsed.recipes.slice(0, 12)
     const generated_at = new Date().toISOString()
 
-    // Store — fire and forget, don't block response
+    // Delete stale cache rows then insert fresh one
+    supabaseUser.from('recipe_suggestions').delete().eq('user_id', user.id)
     supabaseUser.from('recipe_suggestions').insert({ user_id: user.id, recipes, generated_at })
 
     return new Response(
