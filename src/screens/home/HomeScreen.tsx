@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Btn, Card, Ring } from '@/components/ui'
+import { Btn, Card, Chip, Ring, Sparkline } from '@/components/ui'
 import { DateStrip } from '@/components/food/DateStrip'
 import { MealSlotsSection } from '@/components/food/MealSlotsSection'
+import { WeightEntrySheet } from '@/components/health/WeightEntrySheet'
 import { useFoodLogs } from '@/hooks/useFoodLogs'
 import { useProfile } from '@/hooks/useProfile'
 import { useSymptomLog } from '@/hooks/useSymptomLog'
+import { useWeightLogs } from '@/hooks/useWeightLogs'
 import { sumMacros } from '@/lib/macros'
 import { STATIC_TARGETS } from '@/lib/targets'
 import { toLocalDateStr, formatDateLabel } from '@/lib/dates'
 import { formatGL } from '@/lib/gl'
+import { rollingAverage } from '@/lib/rolling-average'
 import type { Tables } from '@/lib/database.types'
 
 type SymptomLog = Tables<'symptom_logs'>
@@ -208,6 +211,82 @@ function SymptomSummaryCard({
   )
 }
 
+// ── WeightCard ───────────────────────────────────────────────────────────────
+
+function WeightCard() {
+  const [showEntry, setShowEntry] = useState(false)
+  const today = toLocalDateStr()
+  const { data: logs = [] } = useWeightLogs()
+
+  const weights = logs.map((l) => l.weight_kg)
+  const avgSeries = rollingAverage(weights, 7)
+  const currentAvg = avgSeries.at(-1) ?? null
+  const prevAvg = avgSeries.length >= 8 ? avgSeries[avgSeries.length - 8] : null
+  const delta =
+    currentAvg != null && prevAvg != null
+      ? Math.round((currentAvg - prevAvg) * 10) / 10
+      : null
+
+  const todayLog = logs.find((l) => l.log_date === today)
+
+  return (
+    <>
+      <Card className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-[0.4px] text-b-ink-3">
+              WEIGHT · 7-DAY AVG
+            </p>
+            {currentAvg != null ? (
+              <div className="mt-1 flex items-baseline gap-2">
+                <span className="text-[26px] font-bold tabular-nums leading-none text-b-ink">
+                  {currentAvg}
+                </span>
+                <span className="text-[13px] text-b-ink-3">kg</span>
+                {delta !== null && delta !== 0 && (
+                  <Chip tone={delta < 0 ? 'mint' : 'neutral'} size="sm">
+                    {delta > 0 ? '+' : ''}{delta} kg
+                  </Chip>
+                )}
+              </div>
+            ) : (
+              <p className="mt-1 text-[14px] text-b-ink-3">No entries yet</p>
+            )}
+          </div>
+
+          {avgSeries.length > 0 && (
+            <Sparkline
+              data={avgSeries}
+              w={100}
+              h={44}
+              color="var(--b-mint)"
+              fill
+              dots
+              dotColor="var(--b-mint)"
+            />
+          )}
+        </div>
+
+        <button
+          onClick={() => setShowEntry(true)}
+          className="mt-3 w-full rounded-b-pill border border-b-hairline bg-b-surface-2 py-2 text-[13px] font-bold text-b-ink active:opacity-70"
+        >
+          {todayLog
+            ? `Today: ${todayLog.weight_kg} kg — Update`
+            : "Log today's weight"}
+        </button>
+      </Card>
+
+      <WeightEntrySheet
+        open={showEntry}
+        onClose={() => setShowEntry(false)}
+        todayDate={today}
+        existingWeight={todayLog?.weight_kg}
+      />
+    </>
+  )
+}
+
 // ── HomeScreen ───────────────────────────────────────────────────────────────
 
 export function HomeScreen() {
@@ -268,6 +347,9 @@ export function HomeScreen() {
 
           {/* Symptom summary */}
           <SymptomSummaryCard dateStr={selectedDate} log={symptomLog} />
+
+          {/* Weight sparkline card */}
+          <WeightCard />
         </div>
       </div>
     </div>
