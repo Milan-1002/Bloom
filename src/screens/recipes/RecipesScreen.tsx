@@ -1,109 +1,24 @@
 import { useState } from 'react'
 import { AppBar, Card, Chip } from '@/components/ui'
+import { useRecipes, type Recipe } from '@/hooks/useRecipes'
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Filter types ───────────────────────────────────────────────────────────────
 
-type Recipe = {
-  id: string
-  name: string
-  image: string
-  timeMin: number
-  kcal: number
-  protein_g: number
-  fiber_g: number
-  gl: number
+type Filter = 'All' | 'Low GL' | 'High protein' | 'High fiber' | 'Anti-inflam' | 'Under 30 min'
+const FILTERS: Filter[] = ['All', 'Low GL', 'High protein', 'High fiber', 'Anti-inflam', 'Under 30 min']
+
+const FILTER_TAG: Record<Filter, string | null> = {
+  'All':          null,
+  'Low GL':       'low-gl',
+  'High protein': 'high-protein',
+  'High fiber':   'high-fiber',
+  'Anti-inflam':  'anti-inflam',
+  'Under 30 min': 'quick',
 }
 
-type Filter = 'All' | 'Low GL' | 'High protein' | 'Anti-inflam' | 'Under 30 min'
-
-// ── Mock Data ─────────────────────────────────────────────────────────────────
-
-const FEATURED: Recipe[] = [
-  {
-    id: 'f1',
-    name: 'Wild salmon, quinoa + greens bowl',
-    image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=480&q=80&auto=format&fit=crop',
-    timeMin: 25,
-    kcal: 540,
-    protein_g: 38,
-    fiber_g: 8,
-    gl: 13,
-  },
-  {
-    id: 'f2',
-    name: 'Shakshuka with feta + herbs',
-    image: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=480&q=80&auto=format&fit=crop',
-    timeMin: 20,
-    kcal: 380,
-    protein_g: 22,
-    fiber_g: 5,
-    gl: 5,
-  },
-]
-
-const ALL_RECIPES: Recipe[] = [
-  {
-    id: 'r1',
-    name: 'Rainbow buddha bowl',
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=160&q=80&auto=format&fit=crop',
-    timeMin: 35,
-    kcal: 490,
-    protein_g: 18,
-    fiber_g: 14,
-    gl: 18,
-  },
-  {
-    id: 'r2',
-    name: 'Zucchini noodle stir-fry',
-    image: 'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=160&q=80&auto=format&fit=crop',
-    timeMin: 30,
-    kcal: 310,
-    protein_g: 14,
-    fiber_g: 9,
-    gl: 6,
-  },
-  {
-    id: 'r3',
-    name: 'Sesame tofu + bok choy',
-    image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=160&q=80&auto=format&fit=crop',
-    timeMin: 25,
-    kcal: 350,
-    protein_g: 26,
-    fiber_g: 7,
-    gl: 9,
-  },
-  {
-    id: 'r4',
-    name: 'Hummus plate + veggie sticks',
-    image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=160&q=80&auto=format&fit=crop',
-    timeMin: 8,
-    kcal: 280,
-    protein_g: 12,
-    fiber_g: 11,
-    gl: 7,
-  },
-  {
-    id: 'r5',
-    name: 'Avocado + poached egg toast',
-    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=160&q=80&auto=format&fit=crop',
-    timeMin: 10,
-    kcal: 420,
-    protein_g: 18,
-    fiber_g: 7,
-    gl: 14,
-  },
-]
-
-const TOTAL = FEATURED.length + ALL_RECIPES.length
-const FILTERS: Filter[] = ['All', 'Low GL', 'High protein', 'Anti-inflam', 'Under 30 min']
-
 function matchesFilter(r: Recipe, f: Filter): boolean {
-  if (f === 'All') return true
-  if (f === 'Low GL') return r.gl < 10
-  if (f === 'High protein') return r.protein_g >= 20
-  if (f === 'Anti-inflam') return r.gl < 15 && r.fiber_g >= 7
-  if (f === 'Under 30 min') return r.timeMin <= 30
-  return true
+  const tag = FILTER_TAG[f]
+  return tag === null || r.tags.includes(tag)
 }
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -153,23 +68,73 @@ function LeafIcon() {
   )
 }
 
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+
+function Skeleton({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded-lg bg-b-surface-sunken ${className ?? ''}`} />
+}
+
+function RecipesLoadingSkeleton() {
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Featured skeleton */}
+      <div>
+        <Skeleton className="mb-3 h-5 w-40" />
+        <div className="flex gap-3 overflow-hidden">
+          {[0, 1].map(i => (
+            <div key={i} className="w-60 shrink-0 overflow-hidden rounded-b-md border border-b-hairline bg-b-surface shadow-b-card">
+              <Skeleton className="h-36 w-full rounded-none" />
+              <div className="p-3.5 flex flex-col gap-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-3 w-3/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Grid skeleton */}
+      <div>
+        <Skeleton className="mb-3 h-5 w-32" />
+        <div className="grid grid-cols-2 gap-2.5">
+          {[0, 1, 2, 3].map(i => <Skeleton key={i} className="h-24 rounded-b-md" />)}
+        </div>
+      </div>
+      {/* List skeleton */}
+      <div className="flex flex-col gap-2.5">
+        {[0, 1, 2, 3].map(i => (
+          <div key={i} className="flex items-center gap-3 rounded-b-md border border-b-hairline bg-b-surface p-3 shadow-b-card">
+            <Skeleton className="h-16 w-16 shrink-0 rounded-xl" />
+            <div className="flex flex-1 flex-col gap-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── Category Tile ─────────────────────────────────────────────────────────────
 
 function CategoryTile({
-  emoji, title, count, bg, accentColor,
+  emoji, title, count, bg, accentColor, onClick,
 }: {
-  emoji: string; title: string; count: string; bg: string; accentColor: string
+  emoji: string; title: string; count: number; bg: string; accentColor: string; onClick: () => void
 }) {
   return (
     <button
-      className="flex flex-col items-start rounded-b-md p-3.5 text-left active:opacity-75 transition-opacity"
+      onClick={onClick}
+      className="flex flex-col items-start rounded-b-md p-3.5 text-left transition-opacity active:opacity-75"
       style={{ background: bg }}
     >
       <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-b-surface text-lg shadow-b-card">
         {emoji}
       </div>
       <p className="mt-2.5 text-[13px] font-bold text-b-ink">{title}</p>
-      <p className="mt-0.5 text-[11px] font-bold" style={{ color: accentColor }}>{count}</p>
+      <p className="mt-0.5 text-[11px] font-bold" style={{ color: accentColor }}>
+        {count} recipes
+      </p>
     </button>
   )
 }
@@ -180,15 +145,11 @@ function FeaturedCard({ recipe }: { recipe: Recipe }) {
   return (
     <div className="w-60 shrink-0 overflow-hidden rounded-b-md border border-b-hairline bg-b-surface shadow-b-card">
       <div className="relative">
-        <img
-          src={recipe.image}
-          alt={recipe.name}
-          className="h-36 w-full object-cover"
-        />
+        <img src={recipe.image} alt={recipe.name} className="h-36 w-full object-cover" />
         <div className="absolute left-2.5 top-2.5">
           <span className="inline-flex items-center gap-1 rounded-b-pill bg-white/90 px-2 py-1 text-[11px] font-semibold text-b-ink shadow-sm">
             <span className="text-[color:var(--b-mint)]"><LeafIcon /></span>
-            Low GL · {recipe.gl}
+            {recipe.tags.includes('low-gl') ? `Low GL · ${recipe.gl}` : `GL · ${recipe.gl}`}
           </span>
         </div>
         <button className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-[color:var(--b-coral)] active:opacity-70">
@@ -228,15 +189,18 @@ function RecipeListRow({ recipe }: { recipe: Recipe }) {
           <span className="h-1 w-1 rounded-full bg-b-ink-4" />
           <span>P {recipe.protein_g}g</span>
         </div>
-        <div className="mt-1.5 flex gap-1">
-          {recipe.gl < 10 && (
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          {recipe.tags.includes('low-gl') && (
             <Chip size="sm" tone="mint" icon={<LeafIcon />}>Low GL</Chip>
           )}
-          {recipe.protein_g >= 20 && (
+          {recipe.tags.includes('high-protein') && (
             <Chip size="sm" tone="primary">High protein</Chip>
           )}
-          {recipe.fiber_g >= 10 && (
+          {recipe.tags.includes('high-fiber') && (
             <Chip size="sm" tone="amber">High fiber</Chip>
+          )}
+          {recipe.tags.includes('anti-inflam') && (
+            <Chip size="sm" tone="accent">Anti-inflam</Chip>
           )}
         </div>
       </div>
@@ -249,11 +213,22 @@ function RecipeListRow({ recipe }: { recipe: Recipe }) {
 
 // ── RecipesScreen ─────────────────────────────────────────────────────────────
 
+const CATEGORIES: Array<{
+  emoji: string; title: string; filter: Filter; bg: string; accentColor: string
+}> = [
+  { emoji: '🌾', title: 'High fiber',    filter: 'High fiber',   bg: 'var(--b-mint-soft)',    accentColor: 'var(--b-fiber)' },
+  { emoji: '💪', title: 'High protein',  filter: 'High protein', bg: 'var(--b-primary-soft)', accentColor: 'var(--b-protein)' },
+  { emoji: '🍓', title: 'Low glycemic',  filter: 'Low GL',       bg: 'var(--b-amber-soft)',   accentColor: 'var(--b-amber)' },
+  { emoji: '🩷', title: 'Anti-inflam',   filter: 'Anti-inflam',  bg: 'var(--b-berry-soft)',   accentColor: 'var(--b-berry)' },
+]
+
 export function RecipesScreen() {
   const [activeFilter, setActiveFilter] = useState<Filter>('All')
+  const { data: allRecipes = [], isLoading } = useRecipes()
 
-  const visibleFeatured = FEATURED.filter(r => matchesFilter(r, activeFilter))
-  const visibleList = ALL_RECIPES.filter(r => matchesFilter(r, activeFilter))
+  const filtered = allRecipes.filter(r => matchesFilter(r, activeFilter))
+  const featured = filtered.slice(0, 2)
+  const list = filtered.slice(2)
 
   return (
     <div className="flex h-full flex-col bg-b-bg">
@@ -278,7 +253,9 @@ export function RecipesScreen() {
       <div className="shrink-0 px-4 pb-3 pt-1">
         <div className="flex h-11 items-center gap-2.5 rounded-b-pill border border-b-hairline bg-b-surface px-4 text-b-ink-3">
           <SearchIcon />
-          <span className="text-[13px]">Search {TOTAL} recipes…</span>
+          <span className="text-[13px]">
+            {isLoading ? 'Loading recipes…' : `Search ${allRecipes.length} recipes…`}
+          </span>
         </div>
         <div className="mt-3 flex gap-2 overflow-x-auto pb-0.5">
           {FILTERS.map(f => (
@@ -289,76 +266,87 @@ export function RecipesScreen() {
               onClick={() => setActiveFilter(f)}
               className="shrink-0"
             >
-              {f === 'All' ? `All ${TOTAL}` : f}
+              {f === 'All' ? (isLoading ? 'All' : `All ${allRecipes.length}`) : f}
             </Chip>
           ))}
         </div>
       </div>
 
-      {/* Scrollable body */}
+      {/* Body */}
       <div className="flex-1 overflow-y-auto px-4 pb-6">
-        <div className="flex flex-col gap-5">
-
-          {/* Featured horizontal scroll */}
-          {visibleFeatured.length > 0 && (
-            <div>
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-[15px] font-bold text-b-ink">Bloom's picks for you</p>
-                <button className="text-[13px] font-bold text-b-accent active:opacity-70">See all</button>
-              </div>
-              <div className="flex gap-3 overflow-x-auto pb-1">
-                {visibleFeatured.map(r => (
-                  <FeaturedCard key={r.id} recipe={r} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Browse by need (only shown on "All" filter) */}
-          {activeFilter === 'All' && (
-            <div>
-              <p className="mb-3 text-[15px] font-bold text-b-ink">Browse by need</p>
-              <div className="grid grid-cols-2 gap-2.5">
-                <CategoryTile
-                  emoji="🌾" title="High fiber" count="32 recipes"
-                  bg="var(--b-mint-soft)" accentColor="var(--b-fiber)"
-                />
-                <CategoryTile
-                  emoji="💪" title="High protein" count="28 recipes"
-                  bg="var(--b-primary-soft)" accentColor="var(--b-protein)"
-                />
-                <CategoryTile
-                  emoji="🍓" title="Low glycemic" count="24 recipes"
-                  bg="var(--b-amber-soft)" accentColor="var(--b-amber)"
-                />
-                <CategoryTile
-                  emoji="🩷" title="Cycle-aware" count="18 recipes"
-                  bg="var(--b-berry-soft)" accentColor="var(--b-berry)"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Recipe list */}
-          <div>
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-[15px] font-bold text-b-ink">
-                {activeFilter === 'All' ? 'More from your plan' : activeFilter}
-              </p>
-              <span className="text-[12px] text-b-ink-3">{visibleList.length} recipes</span>
-            </div>
-            {visibleList.length > 0 ? (
-              <div className="flex flex-col gap-2.5">
-                {visibleList.map(r => (
-                  <RecipeListRow key={r.id} recipe={r} />
-                ))}
-              </div>
-            ) : (
-              <p className="py-8 text-center text-[13px] text-b-ink-3">No recipes match this filter.</p>
-            )}
+        {isLoading ? (
+          <RecipesLoadingSkeleton />
+        ) : allRecipes.length === 0 ? (
+          <div className="flex flex-col items-center py-16 text-center">
+            <p className="text-[32px]">🌿</p>
+            <p className="mt-3 text-[15px] font-bold text-b-ink">Generating your recipes</p>
+            <p className="mt-1 text-[13px] text-b-ink-3">
+              Claude is personalising recipes for your PCOS profile.
+            </p>
           </div>
+        ) : (
+          <div className="flex flex-col gap-5">
 
-        </div>
+            {/* Featured horizontal scroll */}
+            {featured.length > 0 && (
+              <div>
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-[15px] font-bold text-b-ink">
+                    {activeFilter === 'All' ? "Bloom's picks for you" : activeFilter}
+                  </p>
+                  <button className="text-[13px] font-bold text-b-accent active:opacity-70">
+                    See all
+                  </button>
+                </div>
+                <div className="flex gap-3 overflow-x-auto pb-1">
+                  {featured.map(r => <FeaturedCard key={r.id} recipe={r} />)}
+                </div>
+              </div>
+            )}
+
+            {/* Browse by need (All filter only) */}
+            {activeFilter === 'All' && (
+              <div>
+                <p className="mb-3 text-[15px] font-bold text-b-ink">Browse by need</p>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {CATEGORIES.map(cat => (
+                    <CategoryTile
+                      key={cat.filter}
+                      emoji={cat.emoji}
+                      title={cat.title}
+                      count={allRecipes.filter(r => matchesFilter(r, cat.filter)).length}
+                      bg={cat.bg}
+                      accentColor={cat.accentColor}
+                      onClick={() => setActiveFilter(cat.filter)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recipe list */}
+            {list.length > 0 && (
+              <div>
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-[15px] font-bold text-b-ink">
+                    {activeFilter === 'All' ? 'More from your plan' : 'All results'}
+                  </p>
+                  <span className="text-[12px] text-b-ink-3">{list.length} recipes</span>
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  {list.map(r => <RecipeListRow key={r.id} recipe={r} />)}
+                </div>
+              </div>
+            )}
+
+            {filtered.length === 0 && (
+              <p className="py-8 text-center text-[13px] text-b-ink-3">
+                No recipes match this filter.
+              </p>
+            )}
+
+          </div>
+        )}
       </div>
     </div>
   )
