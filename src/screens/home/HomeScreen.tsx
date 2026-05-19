@@ -5,10 +5,14 @@ import { DateStrip } from '@/components/food/DateStrip'
 import { MealSlotsSection } from '@/components/food/MealSlotsSection'
 import { useFoodLogs } from '@/hooks/useFoodLogs'
 import { useProfile } from '@/hooks/useProfile'
+import { useSymptomLog } from '@/hooks/useSymptomLog'
 import { sumMacros } from '@/lib/macros'
 import { STATIC_TARGETS } from '@/lib/targets'
 import { toLocalDateStr, formatDateLabel } from '@/lib/dates'
 import { formatGL } from '@/lib/gl'
+import type { Tables } from '@/lib/database.types'
+
+type SymptomLog = Tables<'symptom_logs'>
 
 function greeting(): string {
   const h = new Date().getHours()
@@ -115,6 +119,95 @@ function MacroProgressCard({
   )
 }
 
+// ── SymptomSummaryCard ───────────────────────────────────────────────────────
+
+const SYMPTOM_COLORS: Record<string, string> = {
+  energy: 'var(--b-mint)',
+  mood: 'var(--b-accent)',
+  sleep: 'var(--b-primary)',
+  bloating: 'var(--b-coral)',
+  skin: 'var(--b-amber)',
+}
+
+function DotBar({ value, color }: { value: number | null; color: string }) {
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((v) => (
+        <div
+          key={v}
+          className="h-[5px] w-[5px] rounded-full"
+          style={{
+            background: v <= (value ?? 0) ? color : 'var(--b-surface-sunken)',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function SymptomSummaryCard({
+  dateStr,
+  log,
+}: {
+  dateStr: string
+  log: SymptomLog | null | undefined
+}) {
+  const navigate = useNavigate()
+
+  if (!log) {
+    return (
+      <Card className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.4px] text-b-ink-3">SYMPTOMS</p>
+            <p className="mt-0.5 text-[15px] font-bold text-b-ink">How are you feeling?</p>
+          </div>
+          <button
+            onClick={() => navigate('/symptoms')}
+            className="text-[13px] font-bold text-b-accent active:opacity-70"
+          >
+            Log →
+          </button>
+        </div>
+        <p className="mt-1.5 text-[12px] text-b-ink-3">No check-in logged for this day.</p>
+      </Card>
+    )
+  }
+
+  const symptoms: Array<{ key: keyof SymptomLog; label: string }> = [
+    { key: 'energy', label: 'Energy' },
+    { key: 'mood', label: 'Mood' },
+    { key: 'sleep', label: 'Sleep' },
+    { key: 'bloating', label: 'Bloating' },
+    { key: 'skin', label: 'Skin' },
+  ]
+
+  return (
+    <Card className="p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.4px] text-b-ink-3">SYMPTOMS</p>
+          <p className="mt-0.5 text-[15px] font-bold text-b-ink">How you felt</p>
+        </div>
+        <button
+          onClick={() => navigate('/symptoms')}
+          className="text-[13px] font-bold text-b-accent active:opacity-70"
+        >
+          Edit →
+        </button>
+      </div>
+      <div className="grid grid-cols-5 gap-2">
+        {symptoms.map(({ key, label }) => (
+          <div key={key} className="flex flex-col items-center gap-1.5">
+            <p className="text-[9px] font-bold uppercase tracking-[0.3px] text-b-ink-3">{label}</p>
+            <DotBar value={log[key] as number | null} color={SYMPTOM_COLORS[key]} />
+          </div>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
 // ── HomeScreen ───────────────────────────────────────────────────────────────
 
 export function HomeScreen() {
@@ -122,6 +215,7 @@ export function HomeScreen() {
   const [selectedDate, setSelectedDate] = useState(toLocalDateStr())
   const { data: profile } = useProfile()
   const { data: entries = [], isFetching } = useFoodLogs(selectedDate)
+  const { data: symptomLog } = useSymptomLog(selectedDate)
 
   const totals = sumMacros(entries)
   const name = profile?.display_name ?? ''
@@ -171,6 +265,9 @@ export function HomeScreen() {
 
           {/* Meals by slot */}
           <MealSlotsSection entries={entries} selectedDate={selectedDate} />
+
+          {/* Symptom summary */}
+          <SymptomSummaryCard dateStr={selectedDate} log={symptomLog} />
         </div>
       </div>
     </div>
