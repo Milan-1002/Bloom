@@ -24,6 +24,7 @@ export type Database = {
           generated_at: string
           gl_target: number | null
           id: string
+          insulin_score: number | null
           insulin_score_basis: Json | null
           narrative: string | null
           pc_ratio_target: number | null
@@ -40,6 +41,7 @@ export type Database = {
           generated_at?: string
           gl_target?: number | null
           id?: string
+          insulin_score?: number | null
           insulin_score_basis?: Json | null
           narrative?: string | null
           pc_ratio_target?: number | null
@@ -56,6 +58,7 @@ export type Database = {
           generated_at?: string
           gl_target?: number | null
           id?: string
+          insulin_score?: number | null
           insulin_score_basis?: Json | null
           narrative?: string | null
           pc_ratio_target?: number | null
