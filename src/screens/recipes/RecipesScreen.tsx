@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState, useCallback } from 'react'
 import { AppBar, Card, Chip } from '@/components/ui'
 import { useRecipes, type Recipe } from '@/hooks/useRecipes'
 
@@ -23,9 +23,12 @@ function matchesFilter(r: Recipe, f: Filter): boolean {
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
-function HeartIcon({ size = 18 }: { size?: number }) {
+function HeartIcon({ filled = false, size = 18 }: { filled?: boolean; size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg width={size} height={size} viewBox="0 0 24 24"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor" strokeWidth="2"
+    >
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   )
@@ -68,6 +71,25 @@ function LeafIcon() {
   )
 }
 
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  )
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+
+function Toast({ message }: { message: string }) {
+  return (
+    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-b-pill bg-b-ink px-4 py-2.5 shadow-lg">
+      <span className="text-white"><CheckIcon /></span>
+      <span className="whitespace-nowrap text-[13px] font-semibold text-white">{message}</span>
+    </div>
+  )
+}
+
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 
 function Skeleton({ className }: { className?: string }) {
@@ -77,7 +99,6 @@ function Skeleton({ className }: { className?: string }) {
 function RecipesLoadingSkeleton() {
   return (
     <div className="flex flex-col gap-5">
-      {/* Featured skeleton */}
       <div>
         <Skeleton className="mb-3 h-5 w-40" />
         <div className="flex gap-3 overflow-hidden">
@@ -92,14 +113,12 @@ function RecipesLoadingSkeleton() {
           ))}
         </div>
       </div>
-      {/* Grid skeleton */}
       <div>
         <Skeleton className="mb-3 h-5 w-32" />
         <div className="grid grid-cols-2 gap-2.5">
           {[0, 1, 2, 3].map(i => <Skeleton key={i} className="h-24 rounded-b-md" />)}
         </div>
       </div>
-      {/* List skeleton */}
       <div className="flex flex-col gap-2.5">
         {[0, 1, 2, 3].map(i => (
           <div key={i} className="flex items-center gap-3 rounded-b-md border border-b-hairline bg-b-surface p-3 shadow-b-card">
@@ -141,7 +160,14 @@ function CategoryTile({
 
 // ── Featured Card ─────────────────────────────────────────────────────────────
 
-function FeaturedCard({ recipe }: { recipe: Recipe }) {
+function FeaturedCard({
+  recipe, isFaved, onFave, onAdd,
+}: {
+  recipe: Recipe
+  isFaved: boolean
+  onFave: () => void
+  onAdd: () => void
+}) {
   return (
     <div className="w-60 shrink-0 overflow-hidden rounded-b-md border border-b-hairline bg-b-surface shadow-b-card">
       <div className="relative">
@@ -152,18 +178,30 @@ function FeaturedCard({ recipe }: { recipe: Recipe }) {
             {recipe.tags.includes('low-gl') ? `Low GL · ${recipe.gl}` : `GL · ${recipe.gl}`}
           </span>
         </div>
-        <button className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-[color:var(--b-coral)] active:opacity-70">
-          <HeartIcon size={14} />
+        <button
+          onClick={onFave}
+          className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 transition-transform active:scale-90"
+          style={{ color: 'var(--b-coral)' }}
+          aria-label={isFaved ? 'Remove from saved' : 'Save recipe'}
+        >
+          <HeartIcon size={14} filled={isFaved} />
         </button>
       </div>
       <div className="p-3.5">
         <p className="text-[13.5px] font-bold leading-snug text-b-ink">{recipe.name}</p>
-        <div className="mt-2 flex items-center gap-2 text-[11px] font-semibold text-b-ink-3">
-          <span>⏱ {recipe.timeMin} min</span>
-          <span className="h-1 w-1 rounded-full bg-b-ink-4" />
-          <span>🔥 {recipe.kcal} kcal</span>
-          <span className="h-1 w-1 rounded-full bg-b-ink-4" />
-          <span>P {recipe.protein_g}g</span>
+        <div className="mt-2 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-[11px] font-semibold text-b-ink-3">
+            <span>⏱ {recipe.timeMin} min</span>
+            <span className="h-1 w-1 rounded-full bg-b-ink-4" />
+            <span>🔥 {recipe.kcal} kcal</span>
+          </div>
+          <button
+            onClick={onAdd}
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-b-primary text-white transition-transform active:scale-90"
+            aria-label="Add to plan"
+          >
+            <PlusIcon />
+          </button>
         </div>
       </div>
     </div>
@@ -172,14 +210,27 @@ function FeaturedCard({ recipe }: { recipe: Recipe }) {
 
 // ── Recipe List Row ───────────────────────────────────────────────────────────
 
-function RecipeListRow({ recipe }: { recipe: Recipe }) {
+function RecipeListRow({
+  recipe, isFaved, onFave, onAdd,
+}: {
+  recipe: Recipe
+  isFaved: boolean
+  onFave: () => void
+  onAdd: () => void
+}) {
   return (
     <Card pad="sm" className="flex items-center gap-3">
-      <img
-        src={recipe.image}
-        alt={recipe.name}
-        className="h-16 w-16 shrink-0 rounded-xl object-cover"
-      />
+      <div className="relative shrink-0">
+        <img src={recipe.image} alt={recipe.name} className="h-16 w-16 rounded-xl object-cover" />
+        <button
+          onClick={onFave}
+          className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-b-card transition-transform active:scale-90"
+          style={{ color: 'var(--b-coral)' }}
+          aria-label={isFaved ? 'Remove from saved' : 'Save recipe'}
+        >
+          <HeartIcon size={11} filled={isFaved} />
+        </button>
+      </div>
       <div className="flex-1 min-w-0">
         <p className="text-[13px] font-bold leading-snug text-b-ink">{recipe.name}</p>
         <div className="mt-1.5 flex items-center gap-2 text-[11px] font-semibold text-b-ink-3">
@@ -204,7 +255,11 @@ function RecipeListRow({ recipe }: { recipe: Recipe }) {
           )}
         </div>
       </div>
-      <button className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-b-primary text-white active:opacity-70">
+      <button
+        onClick={onAdd}
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-b-primary text-white transition-transform active:scale-90"
+        aria-label="Add to plan"
+      >
         <PlusIcon />
       </button>
     </Card>
@@ -216,22 +271,73 @@ function RecipeListRow({ recipe }: { recipe: Recipe }) {
 const CATEGORIES: Array<{
   emoji: string; title: string; filter: Filter; bg: string; accentColor: string
 }> = [
-  { emoji: '🌾', title: 'High fiber',    filter: 'High fiber',   bg: 'var(--b-mint-soft)',    accentColor: 'var(--b-fiber)' },
-  { emoji: '💪', title: 'High protein',  filter: 'High protein', bg: 'var(--b-primary-soft)', accentColor: 'var(--b-protein)' },
-  { emoji: '🍓', title: 'Low glycemic',  filter: 'Low GL',       bg: 'var(--b-amber-soft)',   accentColor: 'var(--b-amber)' },
-  { emoji: '🩷', title: 'Anti-inflam',   filter: 'Anti-inflam',  bg: 'var(--b-berry-soft)',   accentColor: 'var(--b-berry)' },
+  { emoji: '🌾', title: 'High fiber',   filter: 'High fiber',   bg: 'var(--b-mint-soft)',    accentColor: 'var(--b-fiber)' },
+  { emoji: '💪', title: 'High protein', filter: 'High protein', bg: 'var(--b-primary-soft)', accentColor: 'var(--b-protein)' },
+  { emoji: '🍓', title: 'Low glycemic', filter: 'Low GL',       bg: 'var(--b-amber-soft)',   accentColor: 'var(--b-amber)' },
+  { emoji: '🩷', title: 'Anti-inflam',  filter: 'Anti-inflam',  bg: 'var(--b-berry-soft)',   accentColor: 'var(--b-berry)' },
 ]
 
 export function RecipesScreen() {
   const [activeFilter, setActiveFilter] = useState<Filter>('All')
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  const [showFavsOnly, setShowFavsOnly] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+
   const { data: allRecipes = [], isLoading } = useRecipes()
 
-  const filtered = allRecipes.filter(r => matchesFilter(r, activeFilter))
+  const showToast = useCallback((msg: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    setToast(msg)
+    toastTimer.current = setTimeout(() => setToast(null), 2000)
+  }, [])
+
+  const toggleFave = useCallback((id: string, name: string) => {
+    setFavorites(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+        showToast('Removed from saved')
+      } else {
+        next.add(id)
+        showToast(`Saved "${name.split(' ').slice(0, 3).join(' ')}…"`)
+      }
+      return next
+    })
+  }, [showToast])
+
+  const handleAdd = useCallback((name: string) => {
+    showToast(`"${name.split(' ').slice(0, 3).join(' ')}…" added to plan`)
+  }, [showToast])
+
+  const handleSeeAll = useCallback(() => {
+    listRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
+
+  const handleHeaderHeart = useCallback(() => {
+    setShowFavsOnly(prev => {
+      if (!prev && favorites.size === 0) {
+        showToast('Save recipes with the ♡ button')
+        return false
+      }
+      return !prev
+    })
+    setActiveFilter('All')
+  }, [favorites.size, showToast])
+
+  // Apply filters
+  let filtered = allRecipes.filter(r => matchesFilter(r, activeFilter))
+  if (showFavsOnly) filtered = filtered.filter(r => favorites.has(r.id))
+
   const featured = filtered.slice(0, 2)
   const list = filtered.slice(2)
+  const totalFiltered = filtered.length
 
   return (
     <div className="flex h-full flex-col bg-b-bg">
+      {toast && <Toast message={toast} />}
+
       {/* Header */}
       <AppBar
         big
@@ -239,10 +345,24 @@ export function RecipesScreen() {
         title="Recipes"
         trailing={
           <>
-            <button className="flex h-9 w-9 items-center justify-center rounded-full border border-b-hairline bg-b-surface text-b-ink-2 active:opacity-70">
-              <HeartIcon />
+            <button
+              onClick={handleHeaderHeart}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-b-hairline bg-b-surface transition-transform active:scale-90"
+              style={{ color: showFavsOnly ? 'var(--b-coral)' : undefined }}
+              aria-label={showFavsOnly ? 'Show all recipes' : 'Show saved recipes'}
+            >
+              <HeartIcon filled={showFavsOnly} />
             </button>
-            <button className="flex h-9 w-9 items-center justify-center rounded-full border border-b-hairline bg-b-surface text-b-ink-2 active:opacity-70">
+            <button
+              onClick={() => {
+                // Cycle through filters as a quick-access shortcut
+                const idx = FILTERS.indexOf(activeFilter)
+                setActiveFilter(FILTERS[(idx + 1) % FILTERS.length])
+                setShowFavsOnly(false)
+              }}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-b-hairline bg-b-surface text-b-ink-2 transition-transform active:scale-90"
+              aria-label="Next filter"
+            >
               <FilterIcon />
             </button>
           </>
@@ -254,16 +374,20 @@ export function RecipesScreen() {
         <div className="flex h-11 items-center gap-2.5 rounded-b-pill border border-b-hairline bg-b-surface px-4 text-b-ink-3">
           <SearchIcon />
           <span className="text-[13px]">
-            {isLoading ? 'Loading recipes…' : `Search ${allRecipes.length} recipes…`}
+            {isLoading
+              ? 'Loading recipes…'
+              : showFavsOnly
+                ? `${favorites.size} saved recipe${favorites.size !== 1 ? 's' : ''}`
+                : `Search ${allRecipes.length} recipes…`}
           </span>
         </div>
         <div className="mt-3 flex gap-2 overflow-x-auto pb-0.5">
           {FILTERS.map(f => (
             <Chip
               key={f}
-              tone={activeFilter === f ? 'primary' : 'ghost'}
+              tone={activeFilter === f && !showFavsOnly ? 'primary' : 'ghost'}
               icon={f === 'Low GL' ? <LeafIcon /> : undefined}
-              onClick={() => setActiveFilter(f)}
+              onClick={() => { setActiveFilter(f); setShowFavsOnly(false) }}
               className="shrink-0"
             >
               {f === 'All' ? (isLoading ? 'All' : `All ${allRecipes.length}`) : f}
@@ -276,36 +400,53 @@ export function RecipesScreen() {
       <div className="flex-1 overflow-y-auto px-4 pb-6">
         {isLoading ? (
           <RecipesLoadingSkeleton />
-        ) : allRecipes.length === 0 ? (
+        ) : totalFiltered === 0 ? (
           <div className="flex flex-col items-center py-16 text-center">
-            <p className="text-[32px]">🌿</p>
-            <p className="mt-3 text-[15px] font-bold text-b-ink">Generating your recipes</p>
+            <p className="text-[32px]">{showFavsOnly ? '🤍' : '🌿'}</p>
+            <p className="mt-3 text-[15px] font-bold text-b-ink">
+              {showFavsOnly ? 'No saved recipes yet' : 'No recipes match this filter'}
+            </p>
             <p className="mt-1 text-[13px] text-b-ink-3">
-              Claude is personalising recipes for your PCOS profile.
+              {showFavsOnly
+                ? 'Tap the ♡ on any recipe to save it here.'
+                : 'Try a different filter above.'}
             </p>
           </div>
         ) : (
           <div className="flex flex-col gap-5">
 
-            {/* Featured horizontal scroll */}
+            {/* Featured row */}
             {featured.length > 0 && (
               <div>
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-[15px] font-bold text-b-ink">
-                    {activeFilter === 'All' ? "Bloom's picks for you" : activeFilter}
+                    {showFavsOnly ? 'Saved recipes' : activeFilter === 'All' ? "Bloom's picks for you" : activeFilter}
                   </p>
-                  <button className="text-[13px] font-bold text-b-accent active:opacity-70">
-                    See all
-                  </button>
+                  {!showFavsOnly && list.length > 0 && (
+                    <button
+                      onClick={handleSeeAll}
+                      className="text-[13px] font-bold text-b-accent active:opacity-70"
+                    >
+                      See all {totalFiltered}
+                    </button>
+                  )}
                 </div>
                 <div className="flex gap-3 overflow-x-auto pb-1">
-                  {featured.map(r => <FeaturedCard key={r.id} recipe={r} />)}
+                  {featured.map(r => (
+                    <FeaturedCard
+                      key={r.id}
+                      recipe={r}
+                      isFaved={favorites.has(r.id)}
+                      onFave={() => toggleFave(r.id, r.name)}
+                      onAdd={() => handleAdd(r.name)}
+                    />
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Browse by need (All filter only) */}
-            {activeFilter === 'All' && (
+            {/* Browse by need (All filter, not fav-only) */}
+            {activeFilter === 'All' && !showFavsOnly && (
               <div>
                 <p className="mb-3 text-[15px] font-bold text-b-ink">Browse by need</p>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -317,7 +458,7 @@ export function RecipesScreen() {
                       count={allRecipes.filter(r => matchesFilter(r, cat.filter)).length}
                       bg={cat.bg}
                       accentColor={cat.accentColor}
-                      onClick={() => setActiveFilter(cat.filter)}
+                      onClick={() => { setActiveFilter(cat.filter); setShowFavsOnly(false) }}
                     />
                   ))}
                 </div>
@@ -326,23 +467,25 @@ export function RecipesScreen() {
 
             {/* Recipe list */}
             {list.length > 0 && (
-              <div>
+              <div ref={listRef}>
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-[15px] font-bold text-b-ink">
-                    {activeFilter === 'All' ? 'More from your plan' : 'All results'}
+                    {showFavsOnly ? 'More saved' : activeFilter === 'All' ? 'More from your plan' : 'All results'}
                   </p>
                   <span className="text-[12px] text-b-ink-3">{list.length} recipes</span>
                 </div>
                 <div className="flex flex-col gap-2.5">
-                  {list.map(r => <RecipeListRow key={r.id} recipe={r} />)}
+                  {list.map(r => (
+                    <RecipeListRow
+                      key={r.id}
+                      recipe={r}
+                      isFaved={favorites.has(r.id)}
+                      onFave={() => toggleFave(r.id, r.name)}
+                      onAdd={() => handleAdd(r.name)}
+                    />
+                  ))}
                 </div>
               </div>
-            )}
-
-            {filtered.length === 0 && (
-              <p className="py-8 text-center text-[13px] text-b-ink-3">
-                No recipes match this filter.
-              </p>
             )}
 
           </div>
