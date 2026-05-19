@@ -17,6 +17,7 @@ import { OnboardingPCOSScreen } from '@/screens/onboarding/OnboardingPCOSScreen'
 import { OnboardingDoneScreen } from '@/screens/onboarding/OnboardingDoneScreen'
 import { ProfileScreen } from '@/screens/profile/ProfileScreen'
 import { DiaryScreen } from '@/screens/diary/DiaryScreen'
+import { SymptomsScreen } from '@/screens/symptoms/SymptomsScreen'
 import { FoodSearchScreen } from '@/screens/logging/FoodSearchScreen'
 import { FoodDetailScreen } from '@/screens/logging/FoodDetailScreen'
 import { BarcodeScanScreen } from '@/screens/logging/BarcodeScanScreen'
@@ -58,6 +59,7 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/home" element={<HomeScreen />} />
               <Route path="/diary" element={<DiaryScreen />} />
+              <Route path="/symptoms" element={<SymptomsScreen />} />
               <Route path="/profile" element={<ProfileScreen />} />
             </Route>
           </Route>
