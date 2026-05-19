@@ -1,5 +1,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 const USDA_BASE = 'https://api.nal.usda.gov/fdc/v1'
 // USDA_API_KEY set in Supabase Edge Function secrets. Falls back to DEMO_KEY for dev.
 const USDA_KEY = Deno.env.get('USDA_API_KEY') ?? 'DEMO_KEY'
@@ -45,8 +50,29 @@ function parseFood(f: Record<string, unknown>) {
   }
 }
 
-// verify_jwt: true — Supabase validates JWT before reaching this handler
+// verify_jwt: false — JWT verified manually below so OPTIONS preflight can return 200
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  const jsonHeaders = { ...corsHeaders, 'Content-Type': 'application/json' }
+
+  // Verify caller JWT
+  const authHeader = req.headers.get('Authorization')
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: jsonHeaders })
+  }
+  const supabaseUser = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } }
+  )
+  const { data: { user }, error: authError } = await supabaseUser.auth.getUser()
+  if (authError || !user) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: jsonHeaders })
+  }
+
   try {
     const body = await req.json() as Record<string, unknown>
     const query = body['query'] as string | undefined
@@ -69,7 +95,7 @@ Deno.serve(async (req) => {
 
       if (cached) {
         return new Response(JSON.stringify({ food: cached }), {
-          headers: { 'Content-Type': 'application/json' },
+          headers: jsonHeaders,
         })
       }
 
