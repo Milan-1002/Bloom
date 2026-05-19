@@ -201,7 +201,12 @@ Deno.serve(async (req: Request) => {
     checkForbidden(text)
     let parsed: unknown
     try {
-      parsed = JSON.parse(text)
+      // Strip markdown code fences if model wraps JSON in ```json ... ```
+      let jsonText = text.trim()
+      if (jsonText.startsWith('```')) {
+        jsonText = jsonText.replace(/^```(?:json)?\r?\n?/, '').replace(/\r?\n?```$/, '').trim()
+      }
+      parsed = JSON.parse(jsonText)
     } catch {
       throw new Error('json_parse_failed')
     }
