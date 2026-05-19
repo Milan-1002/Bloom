@@ -85,11 +85,11 @@ Plans:
   3. AI targets are regenerated only when the user's profile changes, not on every dashboard load
   4. When the Claude API is unavailable, the dashboard falls back to static USDA reference targets without errors
   5. The Claude API key is accessible only inside the Edge Function and cannot be extracted from the client bundle
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 04-01: Edge Function scaffold — generate-targets function, Claude API invocation, system prompt with guardrails, ai_daily_targets cache table
-- [ ] 04-02: Target delivery — useAITargets hook, dashboard wiring, fallback static targets, profile-change invalidation
+- [ ] 04-01-PLAN.md — insulin_score migration + type regen, ai-validation pure functions (TDD), generate-targets Edge Function
+- [ ] 04-02-PLAN.md — useAITargets hook, dashboard wiring, fallback static targets, profile-change invalidation
 
 ---
 
