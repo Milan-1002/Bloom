@@ -8,8 +8,9 @@ import { useFoodLogs } from '@/hooks/useFoodLogs'
 import { useProfile } from '@/hooks/useProfile'
 import { useSymptomLog } from '@/hooks/useSymptomLog'
 import { useWeightLogs } from '@/hooks/useWeightLogs'
+import { useAITargets } from '@/hooks/useAITargets'
+import type { AITargets } from '@/hooks/useAITargets'
 import { sumMacros } from '@/lib/macros'
-import { STATIC_TARGETS } from '@/lib/targets'
 import { toLocalDateStr, formatDateLabel } from '@/lib/dates'
 import { formatGL } from '@/lib/gl'
 import { rollingAverage } from '@/lib/rolling-average'
@@ -71,12 +72,19 @@ function MacroProgressCard({
   protein_g,
   fiber_g,
   gl,
+  targets,
 }: {
   kcal: number
   protein_g: number
   fiber_g: number
   gl: number
+  targets: AITargets
 }) {
+  const kcalLabel =
+    targets.source === 'ai'
+      ? `${targets.calorie_min}–${targets.calorie_max} kcal`
+      : `${targets.calorie_max} kcal`
+
   return (
     <Card className="p-4">
       <div className="mb-3 flex items-center justify-between">
@@ -86,7 +94,7 @@ function MacroProgressCard({
         </div>
         <div className="text-right">
           <p className="text-[22px] font-bold tabular-nums leading-none text-b-ink">{kcal}</p>
-          <p className="text-[10px] text-b-ink-3">/ {STATIC_TARGETS.kcal} kcal</p>
+          <p className="text-[10px] text-b-ink-3">/ {kcalLabel}</p>
         </div>
       </div>
 
@@ -94,21 +102,21 @@ function MacroProgressCard({
         <MacroRing
           label="Protein"
           value={Math.round(protein_g)}
-          target={STATIC_TARGETS.protein_g}
+          target={targets.protein_g}
           unit="g"
           color="var(--b-protein)"
         />
         <MacroRing
           label="Fiber"
           value={Math.round(fiber_g * 10) / 10}
-          target={STATIC_TARGETS.fiber_g}
+          target={targets.fiber_g}
           unit="g"
           color="var(--b-fiber)"
         />
         <MacroRing
           label="Glyc. load"
           value={Math.round(gl * 10) / 10}
-          target={STATIC_TARGETS.gl}
+          target={targets.gl_target}
           unit="GL"
           color="var(--b-amber)"
           lowerBetter
@@ -116,8 +124,61 @@ function MacroProgressCard({
       </div>
 
       <p className="mt-3 text-[11px] text-b-ink-3">
-        GL: {formatGL(gl > 0 ? gl : null)} of {STATIC_TARGETS.gl} daily ceiling
+        GL: {formatGL(gl > 0 ? gl : null)} of {targets.gl_target} daily ceiling
       </p>
+    </Card>
+  )
+}
+
+// ── InsulBalanceCard ─────────────────────────────────────────────────────────
+
+function scoreBand(score: number): { label: string; color: string } {
+  if (score <= 40) return { label: 'High risk', color: 'var(--b-coral)' }
+  if (score <= 70) return { label: 'Moderate', color: 'var(--b-amber)' }
+  return { label: 'Optimised', color: 'var(--b-mint)' }
+}
+
+function InsulBalanceCard({ targets }: { targets: AITargets }) {
+  if (targets.source === 'static' || targets.insulin_score == null) {
+    return (
+      <Card className="p-4">
+        <p className="text-[10px] font-bold uppercase tracking-[0.4px] text-b-ink-3">INSULIN BALANCE</p>
+        <p className="mt-1 text-[13px] text-b-ink-3">Personalising your targets…</p>
+      </Card>
+    )
+  }
+
+  const { label, color } = scoreBand(targets.insulin_score)
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-[0.4px] text-b-ink-3">INSULIN BALANCE</p>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span
+              className="text-[28px] font-bold tabular-nums leading-none"
+              style={{ color }}
+            >
+              {targets.insulin_score}
+            </span>
+            <span className="text-[12px] font-semibold" style={{ color }}>
+              {label}
+            </span>
+          </div>
+          {targets.narrative && (
+            <p className="mt-2 text-[12px] leading-relaxed text-b-ink-2">{targets.narrative}</p>
+          )}
+        </div>
+
+        {/* Score bar */}
+        <div className="flex h-14 w-2 shrink-0 overflow-hidden rounded-full bg-b-surface-sunken">
+          <div
+            className="mt-auto w-full rounded-full transition-all duration-500"
+            style={{ height: `${targets.insulin_score}%`, background: color }}
+          />
+        </div>
+      </div>
     </Card>
   )
 }
@@ -295,6 +356,7 @@ export function HomeScreen() {
   const { data: profile } = useProfile()
   const { data: entries = [], isFetching } = useFoodLogs(selectedDate)
   const { data: symptomLog } = useSymptomLog(selectedDate)
+  const { data: aiTargets, isLoading: targetsLoading } = useAITargets()
 
   const totals = sumMacros(entries)
   const name = profile?.display_name ?? ''
@@ -335,15 +397,28 @@ export function HomeScreen() {
           )}
 
           {/* Macro rings */}
-          <MacroProgressCard
-            kcal={totals.kcal}
-            protein_g={totals.protein_g}
-            fiber_g={totals.fiber_g}
-            gl={totals.gl}
-          />
+          {aiTargets && (
+            <MacroProgressCard
+              kcal={totals.kcal}
+              protein_g={totals.protein_g}
+              fiber_g={totals.fiber_g}
+              gl={totals.gl}
+              targets={aiTargets}
+            />
+          )}
+          {!aiTargets && targetsLoading && (
+            <Card className="p-4">
+              <div className="flex justify-center py-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-b-primary border-t-transparent" />
+              </div>
+            </Card>
+          )}
 
           {/* Meals by slot */}
           <MealSlotsSection entries={entries} selectedDate={selectedDate} />
+
+          {/* Insulin Balance score */}
+          {aiTargets && <InsulBalanceCard targets={aiTargets} />}
 
           {/* Symptom summary */}
           <SymptomSummaryCard dateStr={selectedDate} log={symptomLog} />
