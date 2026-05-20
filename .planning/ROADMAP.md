@@ -11,7 +11,7 @@
 - [x] **Phase 2: Core Loop — Food Logging + Today Dashboard** - USDA food search, GL calculation, food diary, dashboard *(completed)*
 - [x] **Phase 3: Health Tracking — Symptoms + Weight** - Symptom logging, weight logging, dashboard integration *(completed)*
 - [x] **Phase 4: AI Targets — Claude Edge Function + Insulin Balance** - Personalized macro targets, Insulin Balance score *(completed)*
-- [ ] **Phase 5: Cycle-Synced Nutrition Targets** - Menstrual phase detection, dynamic GL/macro targets, craving interception, cycle symptom tracking
+- [x] **Phase 5: Cycle-Synced Nutrition Targets** - Menstrual phase detection, dynamic GL/macro targets, craving interception, cycle symptom tracking *(completed 2026-05-20)*
 - [ ] **Phase 6: Automated "Doctor-Ready" Reports** - 30/60/90-day summaries, GL vs symptom timeline, PDF export
 
 ---
@@ -105,12 +105,12 @@ Plans:
   3. The user can view a plain-language explanation of their current cycle phase and how it affects their targets by tapping the phase chip; Claude's narrative includes phase-specific language when targets are generated
   4. During Luteal phase the app surfaces at least 3 low-GL alternatives to common comfort foods
   5. Cycle-specific symptoms (fatigue, bloating, cravings) can be logged and correlate with phase data
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans executed
 
 Plans:
 - [x] 05-01-PLAN.md — Schema migration (5 new columns), getCyclePhase engine, cycleContent static copy, Edge Function PROMPT_VERSION 2
-- [ ] 05-02-PLAN.md — useProfile cycle fields, useAITargets phase-drift check, CyclePhaseChip, LutealTipCard, HomeScreen wiring
-- [ ] 05-03-PLAN.md — Cravings symptom tracking, My Cycle ProfileScreen section, Recipes ?phase=luteal filter
+- [x] 05-02-PLAN.md — useProfile cycle fields, useAITargets phase-drift check, CyclePhaseChip, LutealTipCard, HomeScreen wiring
+- [x] 05-03-PLAN.md — Cravings symptom tracking, My Cycle ProfileScreen section, Recipes ?phase=luteal filter
 
 ### Phase 6: Automated "Doctor-Ready" Reports
 **Goal:** Compile 30/60/90-day averages for GL, fiber, weight, and cycle length into an executive summary; overlay symptom logs on a GL timeline to surface diet–symptom correlations; highlight eating habit patterns (fasting windows, meal timing); flag "red flag" streaks where GL exceeded target; and export the full report as a shareable PDF.
@@ -143,5 +143,5 @@ Plans:
 | 2. Core Loop — Food Logging + Today Dashboard | 4/5 | Complete* | - |
 | 3. Health Tracking — Symptoms + Weight | 2/2 | Complete | - |
 | 4. AI Targets — Claude Edge Function + Insulin Balance | 2/2 | Complete | - |
-| 5. Cycle-Synced Nutrition Targets | 1/3 | In Progress|  |
+| 5. Cycle-Synced Nutrition Targets | 3/3 | Complete | 2026-05-20 |
 | 6. Automated "Doctor-Ready" Reports | 0/3 | Not started | - |
