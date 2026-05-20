@@ -98,6 +98,7 @@ Deferred — not in current roadmap.
 - **CYCL-02**: App auto-calculates cycle day and phase (menstrual / follicular / ovulation / luteal)
 - **CYCL-03**: AI macro targets shift based on cycle phase (tighter GL ceiling in luteal, higher protein in follicular)
 - **CYCL-04**: Cycle phase badge displayed on dashboard
+- **CYCL-05**: User can track cycle-specific cravings (1–5 scale) alongside other symptoms, enabling Phase 6 correlation analysis
 
 ### Macro & GL Trends
 - **MACR-01**: User can view 7-day macro trend charts (protein, fiber, GL as bar charts)

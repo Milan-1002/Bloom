@@ -102,7 +102,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. The app identifies and displays the user's current cycle phase based on their last period date
   2. Daily GL, macro ratios, and calorie targets shift automatically when the cycle phase changes
-  3. The user sees a brief, plain-language explanation when their targets change ("Your insulin sensitivity is lower this week…")
+  3. The user can view a plain-language explanation of their current cycle phase and how it affects their targets by tapping the phase chip; Claude's narrative includes phase-specific language when targets are generated
   4. During Luteal phase the app surfaces at least 3 low-GL alternatives to common comfort foods
   5. Cycle-specific symptoms (fatigue, bloating, cravings) can be logged and correlate with phase data
 **Plans:** 3 plans
