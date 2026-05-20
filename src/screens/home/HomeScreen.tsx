@@ -4,12 +4,15 @@ import { Btn, Card, Chip, Ring, Sparkline } from '@/components/ui'
 import { DateStrip } from '@/components/food/DateStrip'
 import { MealSlotsSection } from '@/components/food/MealSlotsSection'
 import { WeightEntrySheet } from '@/components/health/WeightEntrySheet'
+import { CyclePhaseChip } from '@/components/home/CyclePhaseChip'
+import { LutealTipCard } from '@/components/home/LutealTipCard'
 import { useFoodLogs } from '@/hooks/useFoodLogs'
 import { useProfile } from '@/hooks/useProfile'
 import { useSymptomLog } from '@/hooks/useSymptomLog'
 import { useWeightLogs } from '@/hooks/useWeightLogs'
 import { useAITargets } from '@/hooks/useAITargets'
 import type { AITargets } from '@/hooks/useAITargets'
+import { getCyclePhase } from '@/lib/cycle'
 import { sumMacros } from '@/lib/macros'
 import { toLocalDateStr, formatDateLabel } from '@/lib/dates'
 import { formatGL } from '@/lib/gl'
@@ -361,12 +364,17 @@ export function HomeScreen() {
   const totals = sumMacros(entries)
   const name = profile?.display_name ?? ''
   const dateLabel = formatDateLabel(selectedDate)
+  const cycleResult = getCyclePhase(
+    profile?.last_period_date ? new Date(profile.last_period_date) : null,
+    profile?.cycle_length_days ?? 28,
+  )
 
   return (
     <div className="flex h-full flex-col bg-b-bg">
       {/* Header */}
       <div className="shrink-0 px-5 pb-3 pt-4">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-b-ink-3">{dateLabel}</p>
+        {cycleResult && <CyclePhaseChip result={cycleResult} className="mt-1.5" />}
         <div className="mt-0.5 flex items-center justify-between gap-3">
           <h1 className="font-display text-[22px] leading-tight text-b-ink">
             <span className="italic">{greeting()}</span>
@@ -413,6 +421,9 @@ export function HomeScreen() {
               </div>
             </Card>
           )}
+
+          {/* Luteal phase tip card */}
+          {cycleResult?.phase === 'luteal' && <LutealTipCard />}
 
           {/* Meals by slot */}
           <MealSlotsSection entries={entries} selectedDate={selectedDate} />
