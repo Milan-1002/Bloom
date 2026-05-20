@@ -2,7 +2,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Anthropic from 'https://esm.sh/@anthropic-ai/sdk'
 
-const PROMPT_VERSION = 1
+const PROMPT_VERSION = 2
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -58,7 +58,14 @@ BIOLOGICAL CONSTRAINTS you must respect:
 - calorie_min must never be below 1200 under any circumstances
 - calorie_max - calorie_min must be at least 200
 - fiber_g must be >= 25 for any PCOS profile with insulin resistance
-- gl_target for weight management: 80–110; for maintenance: up to 130`
+- gl_target for weight management: 80–110; for maintenance: up to 130
+
+CYCLE PHASE GUIDANCE — when cycle phase is provided, apply these adjustments:
+- Luteal phase: Lower gl_target by 10–15 from the baseline you would otherwise generate. Increase protein_g floor by 10g. Note in narrative that progesterone drives reduced insulin sensitivity.
+- Follicular phase: gl_target can be up to 10 higher than luteal baseline. Note improving insulin sensitivity.
+- Ovulation phase: Generate near-baseline targets. Note peak energy and oestrogen support.
+- Menstrual phase: Moderate gl_target (same as or slightly below follicular). Emphasise iron-rich foods in narrative. Note prostaglandin influence on energy.
+If no cycle phase is provided, generate targets based on profile alone.`
 
 // ── Types ─────────────────────────────────────────────────────────────────
 interface AITargetsOutput {
@@ -81,6 +88,8 @@ type ProfileRow = {
   height_cm: number | null
   current_weight_kg: number | null
   goal_weight_kg: number | null
+  last_period_date: string | null
+  cycle_length_days: number | null
 }
 
 // ── Pure Functions (inlined — Deno cannot import from src/) ───────────────
@@ -134,7 +143,7 @@ function checkForbidden(text: string): void {
   }
 }
 
-function buildUserPrompt(profile: ProfileRow): string {
+function buildUserPrompt(profile: ProfileRow): { prompt: string; cycle_phase: string | null } {
   const lines = [
     `PCOS type: ${profile.pcos_type ?? 'not specified'}`,
     `Age: ${profile.age ?? 'not specified'}`,
@@ -143,7 +152,35 @@ function buildUserPrompt(profile: ProfileRow): string {
     `Goal weight: ${profile.goal_weight_kg ? profile.goal_weight_kg + ' kg' : 'not specified (maintenance)'}`,
     `Goals: ${profile.goals && profile.goals.length > 0 ? profile.goals.join(', ') : 'not specified'}`,
   ]
-  return lines.join('\n') + '\n\nGenerate daily macro targets for this user.'
+
+  let computedPhase: string | null = null
+
+  if (profile.last_period_date !== null && profile.last_period_date !== undefined) {
+    const parsedDate = new Date(profile.last_period_date)
+    if (!isNaN(parsedDate.getTime())) {
+      const MS_PER_DAY = 86_400_000
+      const daysSince = Math.floor((Date.now() - parsedDate.getTime()) / MS_PER_DAY)
+      const cycleLen = profile.cycle_length_days ?? 28
+      const cycleDay = (daysSince % cycleLen) + 1
+      const follicularEnd = Math.round(cycleLen * 0.46)
+      const ovulationEnd = Math.round(cycleLen * 0.54)
+
+      if (cycleDay <= 5) {
+        computedPhase = 'menstrual'
+      } else if (cycleDay <= follicularEnd) {
+        computedPhase = 'follicular'
+      } else if (cycleDay <= ovulationEnd) {
+        computedPhase = 'ovulation'
+      } else {
+        computedPhase = 'luteal'
+      }
+
+      lines.push(`Cycle phase: ${computedPhase} (day ${cycleDay} of ${cycleLen})`)
+    }
+  }
+
+  const prompt = lines.join('\n') + '\n\nGenerate daily macro targets for this user.'
+  return { prompt, cycle_phase: computedPhase }
 }
 
 // ── Anthropic Client ──────────────────────────────────────────────────────
@@ -177,7 +214,7 @@ Deno.serve(async (req: Request) => {
     // 2. Fetch profile (user_id never enters the Claude prompt — GDPR)
     const { data: profile, error: profileError } = await supabaseUser
       .from('profiles')
-      .select('pcos_type, goals, age, height_cm, current_weight_kg, goal_weight_kg')
+      .select('pcos_type, goals, age, height_cm, current_weight_kg, goal_weight_kg, last_period_date, cycle_length_days')
       .eq('id', user.id)
       .single()
 
@@ -186,12 +223,13 @@ Deno.serve(async (req: Request) => {
     }
 
     // 3. Call Claude
+    const { prompt, cycle_phase } = buildUserPrompt(profile as ProfileRow)
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 512,
       temperature: 0,
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: buildUserPrompt(profile as ProfileRow) }],
+      messages: [{ role: 'user', content: prompt }],
     })
 
     const text = message.content[0].type === 'text' ? message.content[0].text : ''
@@ -227,6 +265,7 @@ Deno.serve(async (req: Request) => {
       insulin_score_basis: { key_factors: targets.key_factors },
       narrative:           String(targets.narrative),
       prompt_version:      PROMPT_VERSION,
+      cycle_phase:         cycle_phase ?? null,
       generated_at,
     })
     if (insertError) throw new Error(`insert_failed: ${insertError.message}`)
