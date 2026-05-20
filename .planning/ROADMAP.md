@@ -105,12 +105,12 @@ Plans:
   3. The user sees a brief, plain-language explanation when their targets change ("Your insulin sensitivity is lower this week…")
   4. During Luteal phase the app surfaces at least 3 low-GL alternatives to common comfort foods
   5. Cycle-specific symptoms (fatigue, bloating, cravings) can be logged and correlate with phase data
-**Plans:** TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 05-01: Cycle phase engine — last-period-date input, phase calculator, phase-aware target overrides in AI Edge Function
-- [ ] 05-02: Dashboard phase banner — phase name, rationale card, macro target refresh on phase change
-- [ ] 05-03: Craving interception — Luteal-phase low-GL food suggestions, cycle-specific symptom tracking
+- [ ] 05-01-PLAN.md — Schema migration (5 new columns), getCyclePhase engine, cycleContent static copy, Edge Function PROMPT_VERSION 2
+- [ ] 05-02-PLAN.md — useProfile cycle fields, useAITargets phase-drift check, CyclePhaseChip, LutealTipCard, HomeScreen wiring
+- [ ] 05-03-PLAN.md — Cravings symptom tracking, My Cycle ProfileScreen section, Recipes ?phase=luteal filter
 
 ### Phase 6: Automated "Doctor-Ready" Reports
 **Goal:** Compile 30/60/90-day averages for GL, fiber, weight, and cycle length into an executive summary; overlay symptom logs on a GL timeline to surface diet–symptom correlations; highlight eating habit patterns (fasting windows, meal timing); flag "red flag" streaks where GL exceeded target; and export the full report as a shareable PDF.
