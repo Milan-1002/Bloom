@@ -1,5 +1,5 @@
-import { useRef, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRef, useState, useCallback, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AppBar, Card, Chip } from '@/components/ui'
 import { useRecipes, type Recipe } from '@/hooks/useRecipes'
 
@@ -287,6 +287,7 @@ const CATEGORIES: Array<{
 
 export function RecipesScreen() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [activeFilter, setActiveFilter] = useState<Filter>('All')
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [showFavsOnly, setShowFavsOnly] = useState(false)
@@ -295,6 +296,15 @@ export function RecipesScreen() {
   const listRef = useRef<HTMLDivElement>(null)
 
   const { data: allRecipes = [], isLoading } = useRecipes()
+
+  // Apply ?phase=luteal filter on mount
+  useEffect(() => {
+    const phase = searchParams.get('phase')
+    if (phase === 'luteal') {
+      setActiveFilter('Low GL')
+      setShowFavsOnly(false)
+    }
+  }, [])
 
   const showToast = useCallback((msg: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current)
