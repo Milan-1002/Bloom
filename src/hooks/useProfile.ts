@@ -9,7 +9,13 @@ export function useProfile() {
     queryKey: ['profile', user?.id],
     queryFn: async () => {
       if (!user) return null
-      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+      const { data } = await supabase
+        .from('profiles')
+        .select(
+          'id, display_name, pcos_type, goals, age, height_cm, current_weight_kg, goal_weight_kg, palette, dark_mode, updated_at, last_period_date, cycle_length_days, period_length_days',
+        )
+        .eq('id', user.id)
+        .single()
       return data ?? null
     },
     enabled: !!user?.id,

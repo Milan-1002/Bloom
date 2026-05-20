@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { STATIC_TARGETS } from '@/lib/targets'
+import { getCyclePhase } from '@/lib/cycle'
 
 export type AITargets = {
   protein_g: number
@@ -15,6 +16,7 @@ export type AITargets = {
   narrative: string
   generated_at: string
   source: 'ai' | 'static'
+  cycle_phase?: string | null
 }
 
 const FALLBACK: AITargets = {
@@ -29,6 +31,7 @@ const FALLBACK: AITargets = {
   narrative: '',
   generated_at: '',
   source: 'static',
+  cycle_phase: null,
 }
 
 function rowToTargets(row: Record<string, unknown>): AITargets {
@@ -44,6 +47,7 @@ function rowToTargets(row: Record<string, unknown>): AITargets {
     narrative:       typeof row.narrative === 'string' ? row.narrative : '',
     generated_at:    typeof row.generated_at === 'string' ? row.generated_at : '',
     source: 'ai',
+    cycle_phase:     typeof row.cycle_phase === 'string' ? row.cycle_phase : null,
   }
 }
 
@@ -55,7 +59,7 @@ export function useAITargets() {
     queryFn: async () => {
       if (!user) return FALLBACK
 
-      // Fetch latest ai_daily_targets row + profile updated_at in parallel
+      // Fetch latest ai_daily_targets row + profile (with cycle fields) in parallel
       const [targetsRes, profileRes] = await Promise.all([
         supabase
           .from('ai_daily_targets')
@@ -66,7 +70,7 @@ export function useAITargets() {
           .maybeSingle(),
         supabase
           .from('profiles')
-          .select('updated_at')
+          .select('updated_at, last_period_date, cycle_length_days')
           .eq('id', user.id)
           .single(),
       ])
@@ -74,9 +78,29 @@ export function useAITargets() {
       const existing = targetsRes.data
       const profileUpdatedAt = profileRes.data?.updated_at ?? null
 
-      // Regenerate if no row exists, or profile was updated after last generation
+      // Compute current cycle phase from profile data
+      const lastPeriodDateRaw = profileRes.data?.last_period_date ?? null
+      const cycleLengthDays = profileRes.data?.cycle_length_days ?? 28
+      const lastPeriodDate = lastPeriodDateRaw ? new Date(lastPeriodDateRaw) : null
+      const cycleResult = getCyclePhase(lastPeriodDate, cycleLengthDays)
+      const computedPhase = cycleResult?.phase ?? null
+
+      // Phase-drift check: regenerate if stored phase differs from computed phase
+      const phaseDrifted =
+        computedPhase !== null &&
+        existing != null &&
+        (existing as Record<string, unknown>).cycle_phase !== computedPhase
+
+      // Prompt-version check: regenerate if row was generated with an older prompt
+      const promptVersionStale =
+        existing != null &&
+        (((existing as Record<string, unknown>).prompt_version as number) ?? 0) < 2
+
+      // Regenerate if: no row, phase drifted, prompt stale, or profile updated after generation
       const needsRegen =
         !existing ||
+        phaseDrifted ||
+        promptVersionStale ||
         (profileUpdatedAt != null && existing.generated_at < profileUpdatedAt)
 
       if (!needsRegen && existing) {
