@@ -105,10 +105,10 @@ Plans:
   3. The user can view a plain-language explanation of their current cycle phase and how it affects their targets by tapping the phase chip; Claude's narrative includes phase-specific language when targets are generated
   4. During Luteal phase the app surfaces at least 3 low-GL alternatives to common comfort foods
   5. Cycle-specific symptoms (fatigue, bloating, cravings) can be logged and correlate with phase data
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
-- [ ] 05-01-PLAN.md — Schema migration (5 new columns), getCyclePhase engine, cycleContent static copy, Edge Function PROMPT_VERSION 2
+- [x] 05-01-PLAN.md — Schema migration (5 new columns), getCyclePhase engine, cycleContent static copy, Edge Function PROMPT_VERSION 2
 - [ ] 05-02-PLAN.md — useProfile cycle fields, useAITargets phase-drift check, CyclePhaseChip, LutealTipCard, HomeScreen wiring
 - [ ] 05-03-PLAN.md — Cravings symptom tracking, My Cycle ProfileScreen section, Recipes ?phase=luteal filter
 
@@ -143,5 +143,5 @@ Plans:
 | 2. Core Loop — Food Logging + Today Dashboard | 4/5 | Complete* | - |
 | 3. Health Tracking — Symptoms + Weight | 2/2 | Complete | - |
 | 4. AI Targets — Claude Edge Function + Insulin Balance | 2/2 | Complete | - |
-| 5. Cycle-Synced Nutrition Targets | 0/3 | Not started | - |
+| 5. Cycle-Synced Nutrition Targets | 1/3 | In Progress|  |
 | 6. Automated "Doctor-Ready" Reports | 0/3 | Not started | - |
