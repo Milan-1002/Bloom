@@ -8,9 +8,11 @@
 ## Phases
 
 - [x] **Phase 1: Foundation** - Scaffold, auth, onboarding, database schema + RLS, design system, PWA *(completed 2026-05-18)*
-- [ ] **Phase 2: Core Loop — Food Logging + Today Dashboard** - USDA food search, GL calculation, food diary, dashboard
-- [ ] **Phase 3: Health Tracking — Symptoms + Weight** - Symptom logging, weight logging, dashboard integration
-- [ ] **Phase 4: AI Targets — Claude Edge Function + Insulin Balance** - Personalized macro targets, Insulin Balance score
+- [x] **Phase 2: Core Loop — Food Logging + Today Dashboard** - USDA food search, GL calculation, food diary, dashboard *(completed)*
+- [x] **Phase 3: Health Tracking — Symptoms + Weight** - Symptom logging, weight logging, dashboard integration *(completed)*
+- [x] **Phase 4: AI Targets — Claude Edge Function + Insulin Balance** - Personalized macro targets, Insulin Balance score *(completed)*
+- [ ] **Phase 5: Cycle-Synced Nutrition Targets** - Menstrual phase detection, dynamic GL/macro targets, craving interception, cycle symptom tracking
+- [ ] **Phase 6: Automated "Doctor-Ready" Reports** - 30/60/90-day summaries, GL vs symptom timeline, PDF export
 
 ---
 
@@ -91,15 +93,55 @@ Plans:
 - [ ] 04-01-PLAN.md — insulin_score migration + type regen, ai-validation pure functions (TDD), generate-targets Edge Function
 - [ ] 04-02-PLAN.md — useAITargets hook, dashboard wiring, fallback static targets, profile-change invalidation
 
+### Phase 5: Cycle-Synced Nutrition Targets
+**Goal:** Identify the user's current menstrual phase (Follicular, Ovulation, Luteal, Menstrual) from their profile/cycle data, dynamically adjust daily GL ceiling, macro ratios, and calorie baseline per phase, notify the user when goals shift with a plain-language rationale, surface low-GL craving alternatives during high-craving phases, and track cycle-specific symptoms to validate target effectiveness over time.
+**Mode:** mvp
+**UI hint**: yes
+**Depends on:** Phase 3 (symptom logs), Phase 4 (AI targets)
+**Requirements:** CYCL-01, CYCL-02, CYCL-03, CYCL-04, CYCL-05
+**Success Criteria** (what must be TRUE):
+  1. The app identifies and displays the user's current cycle phase based on their last period date
+  2. Daily GL, macro ratios, and calorie targets shift automatically when the cycle phase changes
+  3. The user sees a brief, plain-language explanation when their targets change ("Your insulin sensitivity is lower this week…")
+  4. During Luteal phase the app surfaces at least 3 low-GL alternatives to common comfort foods
+  5. Cycle-specific symptoms (fatigue, bloating, cravings) can be logged and correlate with phase data
+**Plans:** TBD
+
+Plans:
+- [ ] 05-01: Cycle phase engine — last-period-date input, phase calculator, phase-aware target overrides in AI Edge Function
+- [ ] 05-02: Dashboard phase banner — phase name, rationale card, macro target refresh on phase change
+- [ ] 05-03: Craving interception — Luteal-phase low-GL food suggestions, cycle-specific symptom tracking
+
+### Phase 6: Automated "Doctor-Ready" Reports
+**Goal:** Compile 30/60/90-day averages for GL, fiber, weight, and cycle length into an executive summary; overlay symptom logs on a GL timeline to surface diet–symptom correlations; highlight eating habit patterns (fasting windows, meal timing); flag "red flag" streaks where GL exceeded target; and export the full report as a shareable PDF.
+**Mode:** mvp
+**UI hint**: yes
+**Depends on:** Phase 2 (food logs), Phase 3 (symptom + weight logs), Phase 5 (cycle data)
+**Requirements:** RPT-01, RPT-02, RPT-03, RPT-04, RPT-05
+**Success Criteria** (what must be TRUE):
+  1. A user can generate a 30-, 60-, or 90-day summary showing average GL, fiber, weight change, and cycle length at a glance
+  2. A timeline view overlays logged symptoms directly on the GL graph to reveal diet–symptom correlations
+  3. The report highlights typical eating patterns — average fasting window, meal timing distribution
+  4. "Red flag" streaks (5+ consecutive days exceeding GL target by ≥20%) are automatically flagged
+  5. The complete report exports to a clean PDF the user can email or print for their clinic visit
+**Plans:** TBD
+
+Plans:
+- [ ] 06-01: Data aggregation layer — 30/60/90-day stats, GL vs symptom correlation queries, streak detection
+- [ ] 06-02: Report UI — executive summary screen, GL + symptom timeline chart, pattern highlights, red-flag callouts
+- [ ] 06-03: PDF export — generate and share/download report as PDF
+
 ---
 
 ## Progress
 
-**Execution Order:** 1 → 2 → 3 → 4
+**Execution Order:** 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 5/5 | Complete | 2026-05-18 |
-| 2. Core Loop — Food Logging + Today Dashboard | 0/5 | Not started | - |
-| 3. Health Tracking — Symptoms + Weight | 0/2 | Not started | - |
-| 4. AI Targets — Claude Edge Function + Insulin Balance | 0/2 | Not started | - |
+| 2. Core Loop — Food Logging + Today Dashboard | 4/5 | Complete* | - |
+| 3. Health Tracking — Symptoms + Weight | 2/2 | Complete | - |
+| 4. AI Targets — Claude Edge Function + Insulin Balance | 2/2 | Complete | - |
+| 5. Cycle-Synced Nutrition Targets | 0/3 | Not started | - |
+| 6. Automated "Doctor-Ready" Reports | 0/3 | Not started | - |
