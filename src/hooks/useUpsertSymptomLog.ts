@@ -9,6 +9,7 @@ export interface SymptomPayload {
   sleep: number
   bloating: number
   skin: number
+  cravings: number
 }
 
 export function useUpsertSymptomLog() {
@@ -28,6 +29,7 @@ export function useUpsertSymptomLog() {
           sleep: n(payload.sleep),
           bloating: n(payload.bloating),
           skin: n(payload.skin),
+          cravings: n(payload.cravings),
           logged_at: new Date().toISOString(),
         },
         { onConflict: 'user_id,log_date' },

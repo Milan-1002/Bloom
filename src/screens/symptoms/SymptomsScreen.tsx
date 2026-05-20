@@ -21,10 +21,11 @@ const VALUE_LABELS: Record<string, Record<number, string>> = {
   sleep:    { 0: '—', 1: 'Awful', 2: 'Poor', 3: 'OK', 4: 'Good', 5: 'Great' },
   bloating: { 0: '—', 1: 'None', 2: 'Mild', 3: 'Moderate', 4: 'Bad', 5: 'Severe' },
   skin:     { 0: '—', 1: 'Clear', 2: 'Slight', 3: 'Mild', 4: 'Noticeable', 5: 'Flared' },
+  cravings: { 0: '—', 1: 'None', 2: 'Mild', 3: 'Moderate', 4: 'Strong', 5: 'Intense' },
 }
 
 interface SymDef {
-  key: 'mood' | 'sleep' | 'bloating' | 'skin'
+  key: 'mood' | 'sleep' | 'bloating' | 'skin' | 'cravings'
   label: string
   color: string
   Icon: () => JSX.Element
@@ -60,6 +61,17 @@ const SYMPTOMS: SymDef[] = [
     Icon: () => (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    ),
+  },
+  {
+    key: 'cravings', label: 'Cravings', color: 'var(--b-berry)',
+    Icon: () => (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+        <line x1="9" y1="9" x2="9.01" y2="9" strokeWidth="3" strokeLinecap="round" />
+        <line x1="15" y1="9" x2="15.01" y2="9" strokeWidth="3" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -113,9 +125,9 @@ function SymptomDotBar({
 
 // ── SymptomsScreen ───────────────────────────────────────────────────────────
 
-type SymValues = { energy: number; mood: number; sleep: number; bloating: number; skin: number }
+type SymValues = { energy: number; mood: number; sleep: number; bloating: number; skin: number; cravings: number }
 
-const EMPTY: SymValues = { energy: 0, mood: 0, sleep: 0, bloating: 0, skin: 0 }
+const EMPTY: SymValues = { energy: 0, mood: 0, sleep: 0, bloating: 0, skin: 0, cravings: 0 }
 
 export function SymptomsScreen() {
   const [selectedDate, setSelectedDate] = useState(toLocalDateStr())
@@ -134,6 +146,7 @@ export function SymptomsScreen() {
         sleep: savedLog?.sleep ?? 0,
         bloating: savedLog?.bloating ?? 0,
         skin: savedLog?.skin ?? 0,
+        cravings: savedLog?.cravings ?? 0,
       })
     }
   }, [savedLog, isFetching])
