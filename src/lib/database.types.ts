@@ -20,6 +20,7 @@ export type Database = {
           calorie_max: number | null
           calorie_min: number | null
           created_at: string | null
+          cycle_phase: string | null
           fiber_g: number | null
           generated_at: string
           gl_target: number | null
@@ -37,6 +38,7 @@ export type Database = {
           calorie_max?: number | null
           calorie_min?: number | null
           created_at?: string | null
+          cycle_phase?: string | null
           fiber_g?: number | null
           generated_at?: string
           gl_target?: number | null
@@ -54,6 +56,7 @@ export type Database = {
           calorie_max?: number | null
           calorie_min?: number | null
           created_at?: string | null
+          cycle_phase?: string | null
           fiber_g?: number | null
           generated_at?: string
           gl_target?: number | null
@@ -130,49 +133,80 @@ export type Database = {
           age: number | null
           created_at: string | null
           current_weight_kg: number | null
+          cycle_length_days: number | null
           dark_mode: boolean | null
           display_name: string | null
           goal_weight_kg: number | null
           goals: string[] | null
           height_cm: number | null
           id: string
+          last_period_date: string | null
           palette: string | null
           pcos_type: string | null
+          period_length_days: number | null
           updated_at: string | null
         }
         Insert: {
           age?: number | null
           created_at?: string | null
           current_weight_kg?: number | null
+          cycle_length_days?: number | null
           dark_mode?: boolean | null
           display_name?: string | null
           goal_weight_kg?: number | null
           goals?: string[] | null
           height_cm?: number | null
           id: string
+          last_period_date?: string | null
           palette?: string | null
           pcos_type?: string | null
+          period_length_days?: number | null
           updated_at?: string | null
         }
         Update: {
           age?: number | null
           created_at?: string | null
           current_weight_kg?: number | null
+          cycle_length_days?: number | null
           dark_mode?: boolean | null
           display_name?: string | null
           goal_weight_kg?: number | null
           goals?: string[] | null
           height_cm?: number | null
           id?: string
+          last_period_date?: string | null
           palette?: string | null
           pcos_type?: string | null
+          period_length_days?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      recipe_suggestions: {
+        Row: {
+          generated_at: string
+          id: string
+          recipes: Json
+          user_id: string
+        }
+        Insert: {
+          generated_at?: string
+          id?: string
+          recipes?: Json
+          user_id: string
+        }
+        Update: {
+          generated_at?: string
+          id?: string
+          recipes?: Json
+          user_id?: string
         }
         Relationships: []
       }
       symptom_logs: {
         Row: {
           bloating: number | null
+          cravings: number | null
           created_at: string | null
           energy: number | null
           id: string
@@ -185,6 +219,7 @@ export type Database = {
         }
         Insert: {
           bloating?: number | null
+          cravings?: number | null
           created_at?: string | null
           energy?: number | null
           id?: string
@@ -197,6 +232,7 @@ export type Database = {
         }
         Update: {
           bloating?: number | null
+          cravings?: number | null
           created_at?: string | null
           energy?: number | null
           id?: string
@@ -425,3 +461,5 @@ export const Constants = {
     Enums: {},
   },
 } as const
+A new version of Supabase CLI is available: v2.100.1 (currently installed v)
+We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
