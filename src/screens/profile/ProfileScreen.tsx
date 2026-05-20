@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AppBar, Avatar, Card, Chip } from '@/components/ui'
+import { AppBar, Avatar, Btn, Card, Chip } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfile } from '@/hooks/useProfile'
 import { supabase } from '@/lib/supabase'
@@ -33,6 +33,22 @@ export function ProfileScreen() {
   const [deleteInput, setDeleteInput] = useState('')
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
+  // My Cycle state
+  const [lastPeriodDate, setLastPeriodDate] = useState('')
+  const [cycleLength, setCycleLength] = useState(28)
+  const [periodLength, setPeriodLength] = useState(5)
+  const [cycleSaving, setCycleSaving] = useState(false)
+  const [cycleSaved, setCycleSaved] = useState(false)
+
+  // Sync cycle fields from profile
+  useEffect(() => {
+    if (profile) {
+      setLastPeriodDate(profile.last_period_date ?? '')
+      setCycleLength(profile.cycle_length_days ?? 28)
+      setPeriodLength(profile.period_length_days ?? 5)
+    }
+  }, [profile])
+
   const handlePaletteChange = (p: Palette) => {
     setPalette(p)
     saveTheme(p, dark)
@@ -64,6 +80,19 @@ export function ProfileScreen() {
     }
     await signOut()
     navigate('/welcome', { replace: true })
+  }
+
+  const handleSaveCycle = async () => {
+    setCycleSaving(true)
+    await supabase.from('profiles').update({
+      last_period_date: lastPeriodDate || null,
+      cycle_length_days: cycleLength,
+      period_length_days: periodLength,
+      updated_at: new Date().toISOString(),
+    }).eq('id', user!.id)
+    setCycleSaving(false)
+    setCycleSaved(true)
+    setTimeout(() => setCycleSaved(false), 2000)
   }
 
   const displayName = profile?.display_name ?? user?.email ?? 'You'
@@ -148,6 +177,84 @@ export function ProfileScreen() {
                   }`}
                 />
               </button>
+            </div>
+          </Card>
+        </div>
+
+        {/* My Cycle */}
+        <div>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-b-ink-3">
+            My Cycle
+          </p>
+          <Card className="p-4">
+            <p className="mb-3 text-sm font-semibold text-b-ink">Last period start date</p>
+            <input
+              type="date"
+              value={lastPeriodDate}
+              max={new Date().toISOString().split('T')[0]}
+              onChange={(e) => setLastPeriodDate(e.target.value)}
+              className="w-full rounded-b-md border border-b-hairline bg-b-bg px-3 py-2 text-sm text-b-ink outline-none focus:border-b-primary"
+            />
+            {!lastPeriodDate && (
+              <p className="mt-2 text-xs text-b-ink-3">
+                Add your last period date to unlock cycle-synced targets.
+              </p>
+            )}
+
+            <div className="mt-4 flex items-center justify-between border-t border-b-hairline pt-4">
+              <p className="text-sm font-semibold text-b-ink">Cycle length</p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setCycleLength((v) => Math.max(21, v - 1))}
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-b-hairline bg-b-surface text-b-ink-2 active:opacity-70"
+                  aria-label="Decrease cycle length"
+                >
+                  −
+                </button>
+                <span className="w-8 text-center text-sm font-bold text-b-ink">{cycleLength}</span>
+                <button
+                  onClick={() => setCycleLength((v) => Math.min(45, v + 1))}
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-b-hairline bg-b-surface text-b-ink-2 active:opacity-70"
+                  aria-label="Increase cycle length"
+                >
+                  +
+                </button>
+                <span className="text-xs text-b-ink-3">days</span>
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between border-t border-b-hairline pt-4">
+              <p className="text-sm font-semibold text-b-ink">Period length</p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setPeriodLength((v) => Math.max(3, v - 1))}
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-b-hairline bg-b-surface text-b-ink-2 active:opacity-70"
+                  aria-label="Decrease period length"
+                >
+                  −
+                </button>
+                <span className="w-8 text-center text-sm font-bold text-b-ink">{periodLength}</span>
+                <button
+                  onClick={() => setPeriodLength((v) => Math.min(8, v + 1))}
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-b-hairline bg-b-surface text-b-ink-2 active:opacity-70"
+                  aria-label="Increase period length"
+                >
+                  +
+                </button>
+                <span className="text-xs text-b-ink-3">days</span>
+              </div>
+            </div>
+
+            <div className="mt-4 border-t border-b-hairline pt-4">
+              <Btn
+                tone="primary"
+                size="md"
+                full
+                disabled={cycleSaving}
+                onClick={handleSaveCycle}
+              >
+                {cycleSaved ? 'Saved ✓' : cycleSaving ? 'Saving…' : 'Save cycle info'}
+              </Btn>
             </div>
           </Card>
         </div>
