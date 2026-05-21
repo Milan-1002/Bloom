@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useState, useCallback, useRef } from 'react'
 import { Chip } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
-import { recipeImage, type Recipe } from '@/hooks/useRecipes'
+import { type Recipe } from '@/hooks/useRecipes'
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
@@ -99,11 +99,6 @@ export function RecipeDetailScreen() {
       </div>
     )
   }
-
-  const heroUrl = recipeImage(
-    recipe.image.includes('photo-') ? recipe.image.split('photo-')[1].split('?')[0].replace(/^/, 'x') : 'bowl',
-    800
-  ).replace(/w=\d+/, 'w=800')
 
   return (
     <div className="flex h-full flex-col bg-b-bg">

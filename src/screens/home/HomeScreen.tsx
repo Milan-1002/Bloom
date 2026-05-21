@@ -213,7 +213,7 @@ function DotBar({ value, color }: { value: number | null; color: string }) {
 }
 
 function SymptomSummaryCard({
-  dateStr,
+  dateStr: _dateStr,
   log,
 }: {
   dateStr: string

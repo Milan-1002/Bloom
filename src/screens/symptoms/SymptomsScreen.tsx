@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactElement } from 'react'
 import clsx from 'clsx'
 import { AppBar, Btn, Card } from '@/components/ui'
 import { DateStrip } from '@/components/food/DateStrip'
@@ -28,7 +28,7 @@ interface SymDef {
   key: 'mood' | 'sleep' | 'bloating' | 'skin' | 'cravings'
   label: string
   color: string
-  Icon: () => JSX.Element
+  Icon: () => ReactElement
 }
 
 const SYMPTOMS: SymDef[] = [

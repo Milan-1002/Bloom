@@ -94,7 +94,7 @@ function RecentFoodChip({
 
 // ── Search result row ────────────────────────────────────────────────────────
 
-function FoodRow({ food, slot, onSelect }: { food: USDAFood; slot: MealSlot; onSelect: (food: USDAFood) => void }) {
+function FoodRow({ food, slot: _slot, onSelect }: { food: USDAFood; slot: MealSlot; onSelect: (food: USDAFood) => void }) {
   const carbs = food.carbs_g_per_100g ?? 0
   const gl = calculateGL(food.description, carbs)
   const kcal = food.kcal_per_100g != null ? Math.round(food.kcal_per_100g) : null

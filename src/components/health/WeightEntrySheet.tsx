@@ -7,8 +7,7 @@ import { useLogWeight } from '@/hooks/useLogWeight'
 import { formatDateLabel } from '@/lib/dates'
 
 const schema = z.object({
-  weight_kg: z.coerce
-    .number({ invalid_type_error: 'Enter a number' })
+  weight_kg: z.number({ error: 'Enter a number' })
     .min(20, 'Weight must be at least 20 kg')
     .max(300, 'Weight must be under 300 kg'),
 })
@@ -37,7 +36,7 @@ export function WeightEntrySheet({
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { weight_kg: existingWeight ?? ('' as unknown as number) },
+    defaultValues: { weight_kg: existingWeight ?? NaN },
   })
 
   // Re-sync default when existingWeight changes (sheet opened for different day)
@@ -77,7 +76,7 @@ export function WeightEntrySheet({
           {/* Weight input */}
           <div className="my-5 flex items-baseline justify-center gap-2">
             <input
-              {...register('weight_kg')}
+              {...register('weight_kg', { valueAsNumber: true })}
               type="number"
               step="0.1"
               min="20"
