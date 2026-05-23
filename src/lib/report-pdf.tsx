@@ -138,7 +138,6 @@ export interface ReportDocumentProps {
 export function ReportDocument({
   chartImageUrl,
   stats,
-  windowDays,
   windowLabel,
   generatedAt,
 }: ReportDocumentProps) {
