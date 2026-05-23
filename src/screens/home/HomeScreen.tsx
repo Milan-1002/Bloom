@@ -351,6 +351,36 @@ function WeightCard() {
   )
 }
 
+// ── ReportCTACard ────────────────────────────────────────────────────────────
+
+function ReportCTACard() {
+  const navigate = useNavigate()
+  return (
+    <button
+      onClick={() => navigate('/report')}
+      className="w-full rounded-b-lg border border-b-hairline bg-b-surface-2 px-4 py-3.5 text-left active:opacity-70"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[13px] font-semibold text-b-ink">View Health Report</p>
+          <p className="mt-0.5 text-[11px] text-b-ink-3">30/60/90-day GL, symptoms &amp; patterns</p>
+        </div>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          className="shrink-0 text-b-ink-3"
+        >
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </div>
+    </button>
+  )
+}
+
 // ── HomeScreen ───────────────────────────────────────────────────────────────
 
 export function HomeScreen() {
@@ -436,6 +466,9 @@ export function HomeScreen() {
 
           {/* Weight sparkline card */}
           <WeightCard />
+
+          {/* Health report CTA */}
+          <ReportCTACard />
         </div>
       </div>
     </div>
