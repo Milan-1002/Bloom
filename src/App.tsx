@@ -23,6 +23,7 @@ import { FoodDetailScreen } from '@/screens/logging/FoodDetailScreen'
 import { BarcodeScanScreen } from '@/screens/logging/BarcodeScanScreen'
 import { RecipesScreen } from '@/screens/recipes/RecipesScreen'
 import { RecipeDetailScreen } from '@/screens/recipes/RecipeDetailScreen'
+import { ReportScreen } from '@/screens/report/ReportScreen'
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
               <Route path="/log" element={<FoodSearchScreen />} />
               <Route path="/log/detail/:fdcId" element={<FoodDetailScreen />} />
               <Route path="/log/scan" element={<BarcodeScanScreen />} />
+              <Route path="/report" element={<ReportScreen />} />
             </Route>
           </Route>
 
