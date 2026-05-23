@@ -128,7 +128,7 @@ Plans:
 
 Plans:
 - [x] 06-01: Data aggregation layer — report-stats.ts pure functions, useReportData hook, placeholder ReportScreen, /report route registration
-- [ ] 06-02: Report UI — GLSymptomChart (Recharts ComposedChart), full ReportScreen, Home screen CTA
+- [x] 06-02: Report UI — GLSymptomChart (Recharts ComposedChart), full ReportScreen, Home screen CTA
 - [ ] 06-03: PDF export — @react-pdf/renderer + html2canvas, report-pdf.tsx Document, Export PDF button wired
 
 ---
