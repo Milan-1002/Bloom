@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { clsx } from 'clsx'
 import { AppBar, Card, IconBtn } from '@/components/ui'
@@ -7,11 +7,38 @@ import { useReportData } from '@/hooks/useReportData'
 import { computeReportStats } from '@/lib/report-stats'
 import { toLocalDateStr } from '@/lib/dates'
 import type {
-  ReportWindow,
   RedFlagStreak,
   MealTimingStats,
   MealSlotDistribution,
 } from '@/lib/report-stats'
+
+// ─── Window helpers ────────────────────────────────────────────────────────────
+
+type WindowPreset = '30d' | '60d' | '90d' | 'ytd' | 'custom'
+
+function computeYTDDays(): number {
+  const now = new Date()
+  const jan1 = new Date(now.getFullYear(), 0, 1)
+  return Math.max(1, Math.ceil((now.getTime() - jan1.getTime()) / 86400000))
+}
+
+function resolveWindowDays(preset: WindowPreset, customInput: string): number {
+  if (preset === '30d') return 30
+  if (preset === '60d') return 60
+  if (preset === '90d') return 90
+  if (preset === 'ytd') return computeYTDDays()
+  const n = parseInt(customInput, 10)
+  return isNaN(n) || n < 1 ? 7 : Math.min(n, 365)
+}
+
+function resolveWindowLabel(preset: WindowPreset, customInput: string): string {
+  if (preset === 'ytd') return 'YTD'
+  if (preset === 'custom') {
+    const n = parseInt(customInput, 10)
+    return `${isNaN(n) || n < 1 ? 7 : Math.min(n, 365)}d`
+  }
+  return preset // '30d' | '60d' | '90d'
+}
 
 // ─── Icon helpers ──────────────────────────────────────────────────────────────
 
@@ -243,14 +270,14 @@ function LoadingSkeleton() {
   )
 }
 
-function EmptyState({ windowDays }: { windowDays: ReportWindow }) {
+function EmptyState({ windowLabel }: { windowLabel: string }) {
   return (
     <div className="flex flex-col gap-4 px-4 pb-6 pt-3">
       <Card className="p-6 flex flex-col items-center gap-3 text-center">
         <p className="text-[32px]">📊</p>
         <p className="text-[15px] font-bold text-b-ink">Not enough data yet</p>
         <p className="text-[13px] text-b-ink-2">
-          Keep logging for at least 7 days to generate a {windowDays}-day report. You're on
+          Keep logging for at least 7 days to generate a {windowLabel} report. You're on
           your way!
         </p>
       </Card>
@@ -260,19 +287,36 @@ function EmptyState({ windowDays }: { windowDays: ReportWindow }) {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
+const PRESET_PILLS: Array<{ value: WindowPreset; label: string }> = [
+  { value: '30d',  label: '30d' },
+  { value: '60d',  label: '60d' },
+  { value: '90d',  label: '90d' },
+  { value: 'ytd',  label: 'YTD' },
+]
+
 export function ReportScreen() {
   const navigate = useNavigate()
-  const [windowDays, setWindowDays] = useState<ReportWindow>(30)
+  const [preset, setPreset] = useState<WindowPreset>('30d')
+  const [customInput, setCustomInput] = useState<string>('')
   const [isExporting, setIsExporting] = useState(false)
   // chartRef is used by html2canvas capture for PDF export
   const chartRef = useRef<HTMLDivElement>(null)
+
+  const windowDays = resolveWindowDays(preset, customInput)
+  const windowLabel = resolveWindowLabel(preset, customInput)
 
   const { data: rawData, isLoading, error } = useReportData(windowDays)
 
   // Compute stats from raw data
   const stats = rawData ? computeReportStats(rawData) : null
 
-  const windows: ReportWindow[] = [30, 60, 90]
+  // Apply custom value when user presses Enter or blurs
+  const applyCustom = useCallback(() => {
+    const n = parseInt(customInput, 10)
+    if (!isNaN(n) && n >= 1) {
+      setPreset('custom')
+    }
+  }, [customInput])
 
   const handleExport = async () => {
     if (!stats || !chartRef.current || isExporting) return
@@ -296,12 +340,13 @@ export function ReportScreen() {
           chartImageUrl={chartImageUrl}
           stats={stats}
           windowDays={windowDays}
+          windowLabel={windowLabel}
           generatedAt={toLocalDateStr()}
         />
       ).toBlob()
 
       // Step 3: Download or share
-      const filename = `bloom-report-${windowDays}d-${toLocalDateStr()}.pdf`
+      const filename = `bloom-report-${windowLabel}-${toLocalDateStr()}.pdf`
 
       if (
         typeof navigator.share === 'function' &&
@@ -354,21 +399,52 @@ export function ReportScreen() {
       />
 
       {/* Window picker — sticky below AppBar */}
-      <div className="shrink-0 flex gap-1.5 px-4 pb-3 pt-1">
-        {windows.map((w) => (
-          <button
-            key={w}
-            onClick={() => setWindowDays(w)}
-            className={clsx(
-              'flex-1 rounded-b-pill py-1.5 text-[13px] font-semibold transition-colors',
-              windowDays === w
-                ? 'bg-b-primary text-b-primary-ink'
-                : 'bg-b-surface-sunken text-b-ink-2',
-            )}
-          >
-            {w}d
-          </button>
-        ))}
+      <div className="shrink-0 px-4 pb-3 pt-1 space-y-2">
+        {/* Preset pills row */}
+        <div className="flex gap-1.5">
+          {PRESET_PILLS.map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => setPreset(value)}
+              className={clsx(
+                'flex-1 rounded-b-pill py-1.5 text-[13px] font-semibold transition-colors',
+                preset === value
+                  ? 'bg-b-primary text-b-primary-ink'
+                  : 'bg-b-surface-sunken text-b-ink-2',
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Custom days input row */}
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] text-b-ink-3 shrink-0">Custom:</span>
+          <div className={clsx(
+            'flex items-center gap-1.5 flex-1 rounded-b-md border px-2.5 py-1 transition-colors',
+            preset === 'custom'
+              ? 'border-b-primary bg-b-surface'
+              : 'border-b-hairline bg-b-surface-sunken',
+          )}>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={365}
+              value={customInput}
+              placeholder="e.g. 14"
+              onChange={(e) => {
+                setCustomInput(e.target.value)
+                if (e.target.value) setPreset('custom')
+              }}
+              onBlur={applyCustom}
+              onKeyDown={(e) => { if (e.key === 'Enter') { applyCustom(); (e.target as HTMLInputElement).blur() } }}
+              className="w-full bg-transparent text-[13px] text-b-ink outline-none tabular-nums"
+            />
+            <span className="text-[11px] text-b-ink-3 shrink-0">days</span>
+          </div>
+        </div>
       </div>
 
       {/* Scrollable body */}
@@ -386,7 +462,7 @@ export function ReportScreen() {
         )}
 
         {stats && !stats.hasEnoughData && !isLoading && (
-          <EmptyState windowDays={windowDays} />
+          <EmptyState windowLabel={windowLabel} />
         )}
 
         {stats && stats.hasEnoughData && !isLoading && (

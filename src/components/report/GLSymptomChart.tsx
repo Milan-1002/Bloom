@@ -23,11 +23,14 @@ export interface GLSymptomChartProps {
 
 // ─── X-axis helpers ────────────────────────────────────────────────────────────
 
-function computeXTicks(data: ChartDatum[], windowDays: ReportWindow): string[] {
-  // 30d → 1 tick per 7 days (~4–5 ticks)
-  // 60d → 1 tick per 14 days (~4–5 ticks)
-  // 90d → 1 tick per 30 days (~3 ticks)
-  const interval = windowDays === 30 ? 7 : windowDays === 60 ? 14 : 30
+function computeXTicks(data: ChartDatum[], windowDays: number): string[] {
+  // Always aim for ~4–6 ticks regardless of window length
+  const interval =
+    windowDays <= 14  ? 3  :
+    windowDays <= 30  ? 7  :
+    windowDays <= 60  ? 14 :
+    windowDays <= 90  ? 21 :
+    windowDays <= 180 ? 30 : 60
   const ticks: string[] = []
   data.forEach((d, i) => {
     if (i === 0 || i === data.length - 1 || i % interval === 0) {

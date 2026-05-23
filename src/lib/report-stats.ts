@@ -3,7 +3,7 @@
 
 // ─── Exported types ────────────────────────────────────────────────────────────
 
-export type ReportWindow = 30 | 60 | 90
+export type ReportWindow = number
 
 export interface RedFlagStreak {
   startDate: string       // 'YYYY-MM-DD' — first day of the streak

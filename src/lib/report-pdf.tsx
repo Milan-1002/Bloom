@@ -129,6 +129,7 @@ export interface ReportDocumentProps {
   chartImageUrl: string   // PNG data URL from html2canvas
   stats: ReportStats
   windowDays: ReportWindow
+  windowLabel: string     // human label: '30d', 'YTD', '14d', etc.
   generatedAt: string     // 'YYYY-MM-DD' string (today's date)
 }
 
@@ -138,17 +139,18 @@ export function ReportDocument({
   chartImageUrl,
   stats,
   windowDays,
+  windowLabel,
   generatedAt,
 }: ReportDocumentProps) {
   return (
-    <Document title={`Bloom Health Report — ${windowDays}d — ${generatedAt}`}>
+    <Document title={`Bloom Health Report — ${windowLabel} — ${generatedAt}`}>
       <Page size="A4" style={styles.page}>
 
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Bloom Health Report</Text>
           <Text style={styles.subtitle}>
-            {windowDays}-day summary · Generated {fmtDate(generatedAt)} · {stats.daysWithData} days with logged data
+            {windowLabel} summary · Generated {fmtDate(generatedAt)} · {stats.daysWithData} days with logged data
           </Text>
         </View>
         <View style={styles.divider} />
