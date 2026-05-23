@@ -124,12 +124,12 @@ Plans:
   3. The report highlights typical eating patterns — average fasting window, meal timing distribution
   4. "Red flag" streaks (5+ consecutive days exceeding GL target by ≥20%) are automatically flagged
   5. The complete report exports to a clean PDF the user can email or print for their clinic visit
-**Plans:** TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 06-01: Data aggregation layer — 30/60/90-day stats, GL vs symptom correlation queries, streak detection
-- [ ] 06-02: Report UI — executive summary screen, GL + symptom timeline chart, pattern highlights, red-flag callouts
-- [ ] 06-03: PDF export — generate and share/download report as PDF
+- [x] 06-01: Data aggregation layer — report-stats.ts pure functions, useReportData hook, placeholder ReportScreen, /report route registration
+- [ ] 06-02: Report UI — GLSymptomChart (Recharts ComposedChart), full ReportScreen, Home screen CTA
+- [ ] 06-03: PDF export — @react-pdf/renderer + html2canvas, report-pdf.tsx Document, Export PDF button wired
 
 ---
 
@@ -144,4 +144,4 @@ Plans:
 | 3. Health Tracking — Symptoms + Weight | 2/2 | Complete | - |
 | 4. AI Targets — Claude Edge Function + Insulin Balance | 2/2 | Complete | - |
 | 5. Cycle-Synced Nutrition Targets | 3/3 | Complete | 2026-05-20 |
-| 6. Automated "Doctor-Ready" Reports | 0/3 | Not started | - |
+| 6. Automated "Doctor-Ready" Reports | 1/3 | In progress | - |
