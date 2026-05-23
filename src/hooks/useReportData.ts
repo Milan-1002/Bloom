@@ -8,9 +8,6 @@ import type { ReportWindow, ReportInput } from '@/lib/report-stats'
 // Re-export ReportWindow so consumers can import it from this module
 export type { ReportWindow } from '@/lib/report-stats'
 
-// ReportRawData is the full ReportInput ready to pass to computeReportStats
-export interface ReportRawData extends ReportInput {}
-
 export function useReportData(windowDays: ReportWindow) {
   const { user } = useAuth()
 

@@ -88,12 +88,21 @@ function mean(values: number[]): number {
   return values.reduce((sum, v) => sum + v, 0) / values.length
 }
 
-/** Format a Date as 'YYYY-MM-DD' without importing from other modules. */
+/** Format a Date as 'YYYY-MM-DD' using LOCAL date components (not UTC). */
 function formatDateStr(d: Date): string {
   const y = d.getFullYear()
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
   return [y, m, day].join('-')
+}
+
+/**
+ * Extract 'YYYY-MM-DD' in LOCAL time from a timestamptz ISO string.
+ * Using slice(0, 10) on an ISO string extracts the UTC date, which is wrong
+ * for users in positive UTC offsets (food logged at 11:45pm local = next UTC day).
+ */
+function localDateStrFromISO(isoStr: string): string {
+  return formatDateStr(new Date(isoStr))
 }
 
 // ─── Exported functions ────────────────────────────────────────────────────────
@@ -106,7 +115,7 @@ export function computeDailyGL(foodLogs: ReportInput['foodLogs']): DailyGLMap {
   const map: DailyGLMap = {}
   for (const log of foodLogs) {
     if (log.gl === null) continue
-    const dateStr = log.logged_at.slice(0, 10)
+    const dateStr = localDateStrFromISO(log.logged_at)
     map[dateStr] = (map[dateStr] ?? 0) + log.gl
   }
   return map
@@ -120,7 +129,7 @@ export function computeDailyFiber(foodLogs: ReportInput['foodLogs']): DailyFiber
   const map: DailyFiberMap = {}
   for (const log of foodLogs) {
     if (log.fiber_g === null) continue
-    const dateStr = log.logged_at.slice(0, 10)
+    const dateStr = localDateStrFromISO(log.logged_at)
     map[dateStr] = (map[dateStr] ?? 0) + log.fiber_g
   }
   return map
@@ -202,6 +211,8 @@ export function detectRedFlagStreaks(
   let streakEnd: string | null = null
   let streakDays = 0
   const streakOverages: number[] = []
+  // Track the last red date to detect calendar gaps (days with no food log in between).
+  let prevRedDate: string | null = null
 
   const closeStreak = () => {
     if (streakStart !== null && streakEnd !== null && streakDays >= 5) {
@@ -222,6 +233,17 @@ export function detectRedFlagStreaks(
   for (const dateStr of dates) {
     const gl = dailyGL[dateStr]
     if (gl > threshold) {
+      // CR-01 fix: verify calendar continuity. dailyGL only contains dates with
+      // logged food — a missing day means a calendar gap that breaks the streak.
+      if (streakStart !== null && prevRedDate !== null) {
+        const prev = new Date(prevRedDate + 'T12:00:00')
+        const curr = new Date(dateStr + 'T12:00:00')
+        const diffDays = Math.round((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24))
+        if (diffDays > 1) {
+          // Gap detected — close the current streak before starting a new one.
+          closeStreak()
+        }
+      }
       const overagePct = ((gl / glCeiling) - 1) * 100
       if (streakStart === null) {
         streakStart = dateStr
@@ -229,8 +251,10 @@ export function detectRedFlagStreaks(
       streakEnd = dateStr
       streakDays += 1
       streakOverages.push(overagePct)
+      prevRedDate = dateStr
     } else {
       closeStreak()
+      prevRedDate = null
     }
   }
   // Close any open streak after the loop
@@ -249,8 +273,8 @@ export function computeMealTimingStats(
   // Group logs by date
   const byDate: Record<string, number[]> = {}
   for (const log of foodLogs) {
-    const dateStr = log.logged_at.slice(0, 10)
     const d = new Date(log.logged_at)
+    const dateStr = formatDateStr(d) // local date, consistent with computeDailyGL
     const hour = d.getHours() + d.getMinutes() / 60
     if (!byDate[dateStr]) byDate[dateStr] = []
     byDate[dateStr].push(hour)
@@ -361,8 +385,9 @@ export function computeReportStats(input: ReportInput): ReportStats {
   const avgFiber = computeAvgOfMap(dailyFiber)
   const weightChange = computeWeightChange(input.weightLogs)
 
-  const glTrend = computeTrend(Object.values(dailyGL))
-  const fiberTrend = computeTrend(Object.values(dailyFiber))
+  // WR-01: sort by date key before extracting values so trend compares chronological halves
+  const glTrend = computeTrend(Object.keys(dailyGL).sort().map((d) => dailyGL[d]))
+  const fiberTrend = computeTrend(Object.keys(dailyFiber).sort().map((d) => dailyFiber[d]))
   const weightTrend = computeTrend(
     [...input.weightLogs]
       .sort((a, b) => (a.log_date < b.log_date ? -1 : 1))

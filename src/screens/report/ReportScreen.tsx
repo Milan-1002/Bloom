@@ -66,13 +66,11 @@ function formatHour(decimalHour: number): string {
 
 function formatHours(hours: number): string {
   // Convert decimal hours to 'Xh Ym' e.g. 14.5 → '14h 30m'
-  const h = Math.floor(hours)
-  const m = Math.round((hours - h) * 60)
+  // Guard against negative values (e.g. avgFastingWindowHours floating-point edge case)
+  const safeHours = Math.max(0, hours)
+  const h = Math.floor(safeHours)
+  const m = Math.round((safeHours - h) * 60)
   return m > 0 ? `${h}h ${m}m` : `${h}h`
-}
-
-function trendIcon(trend: '▲' | '▼' | '→'): string {
-  return trend
 }
 
 function trendColor(
@@ -117,7 +115,7 @@ function StatCard({
             trendColor(trend, trendHigherIsBetter ?? false),
           )}
         >
-          {trendIcon(trend)} vs earlier
+          {trend} vs earlier
         </p>
       )}
     </Card>
