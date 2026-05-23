@@ -5,6 +5,7 @@ import { AppBar, Card, IconBtn } from '@/components/ui'
 import { GLSymptomChart } from '@/components/report/GLSymptomChart'
 import { useReportData } from '@/hooks/useReportData'
 import { computeReportStats } from '@/lib/report-stats'
+import { toLocalDateStr } from '@/lib/dates'
 import type {
   ReportWindow,
   RedFlagStreak,
@@ -43,6 +44,12 @@ function ShareIcon() {
       <polyline points="16 6 12 2 8 6" />
       <line x1="12" y1="2" x2="12" y2="15" />
     </svg>
+  )
+}
+
+function SpinnerIcon() {
+  return (
+    <div className="h-4 w-4 animate-spin rounded-full border-2 border-b-primary border-t-transparent" />
   )
 }
 
@@ -258,7 +265,8 @@ function EmptyState({ windowDays }: { windowDays: ReportWindow }) {
 export function ReportScreen() {
   const navigate = useNavigate()
   const [windowDays, setWindowDays] = useState<ReportWindow>(30)
-  // chartRef is used by Plan 03 for html2canvas capture — forwarded now
+  const [isExporting, setIsExporting] = useState(false)
+  // chartRef is used by html2canvas capture for PDF export
   const chartRef = useRef<HTMLDivElement>(null)
 
   const { data: rawData, isLoading, error } = useReportData(windowDays)
@@ -267,6 +275,62 @@ export function ReportScreen() {
   const stats = rawData ? computeReportStats(rawData) : null
 
   const windows: ReportWindow[] = [30, 60, 90]
+
+  const handleExport = async () => {
+    if (!stats || !chartRef.current || isExporting) return
+    setIsExporting(true)
+    try {
+      // Step 1: Capture chart as PNG
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(chartRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      })
+      const chartImageUrl = canvas.toDataURL('image/png')
+
+      // Step 2: Generate PDF blob using dynamic import (avoids bundling react-pdf eagerly)
+      const { pdf } = await import('@react-pdf/renderer')
+      const { ReportDocument } = await import('@/lib/report-pdf')
+      const blob = await pdf(
+        <ReportDocument
+          chartImageUrl={chartImageUrl}
+          stats={stats}
+          windowDays={windowDays}
+          generatedAt={toLocalDateStr()}
+        />
+      ).toBlob()
+
+      // Step 3: Download or share
+      const filename = `bloom-report-${windowDays}d-${toLocalDateStr()}.pdf`
+
+      if (
+        typeof navigator.share === 'function' &&
+        navigator.canShare({ files: [new File([blob], filename, { type: 'application/pdf' })] })
+      ) {
+        // iOS / Android native share sheet
+        await navigator.share({
+          title: 'Bloom Health Report',
+          files: [new File([blob], filename, { type: 'application/pdf' })],
+        })
+      } else {
+        // Desktop / unsupported: programmatic download
+        const blobUrl = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = blobUrl
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000)
+      }
+    } catch (err) {
+      console.error('[ReportScreen] PDF export failed:', err)
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   return (
     <div className="flex h-full flex-col bg-b-bg">
@@ -281,13 +345,13 @@ export function ReportScreen() {
           />
         }
         trailing={
-          <IconBtn
-            icon={<ShareIcon />}
-            ariaLabel="Export PDF"
-            onClick={() => {
-              /* wired in Plan 03 */
-            }}
-          />
+          <div className={clsx(isExporting && 'pointer-events-none opacity-50')}>
+            <IconBtn
+              icon={isExporting ? <SpinnerIcon /> : <ShareIcon />}
+              ariaLabel={isExporting ? 'Generating PDF…' : 'Export PDF'}
+              onClick={handleExport}
+            />
+          </div>
         }
       />
 
