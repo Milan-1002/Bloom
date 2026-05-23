@@ -12,7 +12,7 @@
 - [x] **Phase 3: Health Tracking — Symptoms + Weight** - Symptom logging, weight logging, dashboard integration *(completed)*
 - [x] **Phase 4: AI Targets — Claude Edge Function + Insulin Balance** - Personalized macro targets, Insulin Balance score *(completed)*
 - [x] **Phase 5: Cycle-Synced Nutrition Targets** - Menstrual phase detection, dynamic GL/macro targets, craving interception, cycle symptom tracking *(completed 2026-05-20)*
-- [ ] **Phase 6: Automated "Doctor-Ready" Reports** - 30/60/90-day summaries, GL vs symptom timeline, PDF export
+- [x] **Phase 6: Automated "Doctor-Ready" Reports** - 30/60/90-day summaries, GL vs symptom timeline, PDF export *(completed 2026-05-23)*
 
 ---
 
@@ -129,7 +129,7 @@ Plans:
 Plans:
 - [x] 06-01: Data aggregation layer — report-stats.ts pure functions, useReportData hook, placeholder ReportScreen, /report route registration
 - [x] 06-02: Report UI — GLSymptomChart (Recharts ComposedChart), full ReportScreen, Home screen CTA
-- [ ] 06-03: PDF export — @react-pdf/renderer + html2canvas, report-pdf.tsx Document, Export PDF button wired
+- [x] 06-03: PDF export — @react-pdf/renderer + html2canvas, report-pdf.tsx Document, Export PDF button wired
 
 ---
 
@@ -144,4 +144,4 @@ Plans:
 | 3. Health Tracking — Symptoms + Weight | 2/2 | Complete | - |
 | 4. AI Targets — Claude Edge Function + Insulin Balance | 2/2 | Complete | - |
 | 5. Cycle-Synced Nutrition Targets | 3/3 | Complete | 2026-05-20 |
-| 6. Automated "Doctor-Ready" Reports | 1/3 | In progress | - |
+| 6. Automated "Doctor-Ready" Reports | 3/3 | Complete | 2026-05-23 |
