@@ -439,7 +439,7 @@ export function RecipesScreen() {
 
   // ── Data ───────────────────────────────────────────────────────────────────
   const { data: libraryRecipes = [], isLoading } = useLibraryRecipes()
-  const { savedIds, save, unsave } = useSavedRecipes()
+  const { savedIds, save, unsave, data: savedRows = [] } = useSavedRecipes()
   const generateMutation = useGenerateCustomRecipe()
 
   // Apply ?phase=luteal filter on mount
@@ -500,6 +500,8 @@ export function RecipesScreen() {
       {
         onSuccess: recipe => {
           setGeneratedRecipe(recipe)
+          // Auto-persist so the recipe survives page refresh and shows in Saved
+          save.mutate({ recipe, source: 'generated_profile' })
           showToast('Your custom recipe is ready! 🎉')
         },
         onError: () => {
@@ -507,7 +509,7 @@ export function RecipesScreen() {
         },
       }
     )
-  }, [generateMutation, showToast])
+  }, [generateMutation, save, showToast])
 
   const handleGenerateFridge = useCallback((ingredients: string[]) => {
     setGeneratedMode('fridge')
@@ -516,6 +518,8 @@ export function RecipesScreen() {
       {
         onSuccess: recipe => {
           setGeneratedRecipe(recipe)
+          // Auto-persist so the recipe survives page refresh and shows in Saved
+          save.mutate({ recipe, source: 'generated_fridge' })
           showToast('Your fridge recipe is ready! 🥦')
         },
         onError: () => {
@@ -523,7 +527,7 @@ export function RecipesScreen() {
         },
       }
     )
-  }, [generateMutation, showToast])
+  }, [generateMutation, save, showToast])
 
   const handleCancelGeneration = useCallback(() => {
     // useMutation doesn't support true abort yet — just dismiss the overlay visually
@@ -537,10 +541,23 @@ export function RecipesScreen() {
   }, [navigate])
 
   // ── Filter logic ───────────────────────────────────────────────────────────
-  // The "All recipes" pool is library + generated (if present)
-  const allRecipes = generatedRecipe
-    ? [generatedRecipe, ...libraryRecipes]
-    : libraryRecipes
+  // Pull previously-generated recipes back out of the DB so they survive refresh.
+  // Any saved_recipe whose recipe_id starts with "custom-" was AI-generated.
+  const savedCustomRecipes = savedRows
+    .filter(r => r.recipe_id.startsWith('custom-'))
+    .map(r => r.recipe)
+
+  // Build the full recipe pool:
+  //   [freshly-generated (in-session) → other saved customs from DB → library]
+  // De-duplicate: if the freshly-generated recipe is already in savedCustomRecipes
+  // (because auto-save ran), don't show it twice.
+  const savedCustomOthers = generatedRecipe
+    ? savedCustomRecipes.filter(r => r.id !== generatedRecipe.id)
+    : savedCustomRecipes
+
+  const allRecipes: Recipe[] = generatedRecipe
+    ? [generatedRecipe, ...savedCustomOthers, ...libraryRecipes]
+    : [...savedCustomRecipes, ...libraryRecipes]
 
   // Favourites view uses savedIds to reconstruct recipes from allRecipes
   let filtered = showFavsOnly
