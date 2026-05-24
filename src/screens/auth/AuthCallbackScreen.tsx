@@ -32,7 +32,16 @@ export function AuthCallbackScreen() {
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
         if (exchangeError) {
           clearTimeout(timeout)
-          setError(exchangeError.message)
+          // PKCE requires the code_verifier stored in the browser that started sign-up.
+          // If the link is opened in a different browser/device the verifier is missing.
+          const isPkceVerifierMissing =
+            exchangeError.message.includes('code verifier') ||
+            exchangeError.message.includes('code_verifier')
+          setError(
+            isPkceVerifierMissing
+              ? 'Please open this verification link in the same browser you used to sign up, then try again.'
+              : exchangeError.message,
+          )
           return
         }
         // Exchange succeeded → onAuthStateChange fires below → navigate() runs there
