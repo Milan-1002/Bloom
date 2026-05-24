@@ -1,9 +1,10 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useState, useCallback, useRef } from 'react'
 import { Chip } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { type Recipe } from '@/hooks/useRecipes'
+import { useSavedRecipes, type RecipeSource } from '@/hooks/useSavedRecipes'
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
@@ -68,12 +69,14 @@ function Toast({ message }: { message: string }) {
 export function RecipeDetailScreen() {
   const { recipeId } = useParams<{ recipeId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
-  const [isFaved, setIsFaved] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const { savedIds, save, unsave } = useSavedRecipes()
 
   const showToast = useCallback((msg: string) => {
     if (toastTimer.current) clearTimeout(toastTimer.current)
@@ -81,9 +84,39 @@ export function RecipeDetailScreen() {
     toastTimer.current = setTimeout(() => setToast(null), 2000)
   }, [])
 
-  // Read from TanStack Query cache — no extra fetch needed
-  const allRecipes = queryClient.getQueryData<Recipe[]>(['recipes', user?.id])
-  const recipe = allRecipes?.find(r => r.id === recipeId)
+  // ── Resolve recipe ─────────────────────────────────────────────────────────
+  // 1st: navigation state (set by RecipesScreen navigate call) — handles both library + generated
+  // 2nd: library-recipes cache (for direct URL navigation or browser refresh)
+
+  const stateRecipe = (location.state as { recipe?: Recipe } | null)?.recipe
+
+  const libraryRecipes = queryClient.getQueryData<Recipe[]>(['library-recipes'])
+  const cacheRecipe = libraryRecipes?.find(r => r.id === recipeId)
+
+  // Also check saved recipes cache for custom recipes navigated directly
+  const savedRows = queryClient.getQueryData<Array<{ recipe_id: string; recipe: Recipe }>>(
+    ['saved-recipes', user?.id]
+  )
+  const savedRecipe = savedRows?.find(r => r.recipe_id === recipeId)?.recipe
+
+  const recipe: Recipe | undefined = stateRecipe ?? cacheRecipe ?? savedRecipe
+
+  // ── Derived state ──────────────────────────────────────────────────────────
+  const isFaved = !!recipe && savedIds.has(recipe.id)
+
+  const handleFaveToggle = () => {
+    if (!recipe) return
+    if (isFaved) {
+      unsave.mutate(recipe.id)
+      showToast('Removed from saved')
+    } else {
+      const source: RecipeSource = recipe.id.startsWith('custom-')
+        ? 'generated_profile'
+        : 'library'
+      save.mutate({ recipe, source })
+      showToast('Recipe saved! ♡')
+    }
+  }
 
   if (!recipe) {
     return (
@@ -128,10 +161,7 @@ export function RecipeDetailScreen() {
 
           {/* Save button */}
           <button
-            onClick={() => {
-              setIsFaved(v => !v)
-              showToast(isFaved ? 'Removed from saved' : 'Recipe saved!')
-            }}
+            onClick={handleFaveToggle}
             className="absolute right-4 top-safe-top mt-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 shadow-b-card transition-transform active:scale-90"
             style={{ color: 'var(--b-coral)' }}
             aria-label={isFaved ? 'Remove from saved' : 'Save recipe'}
