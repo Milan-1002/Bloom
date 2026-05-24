@@ -13,7 +13,43 @@ export function AuthCallbackScreen() {
       setError('Verification timed out. Please try again.')
     }, TIMEOUT_MS)
 
-    // onAuthStateChange fires after the SDK exchanges the email link token
+    async function handleCallback() {
+      const params = new URLSearchParams(window.location.search)
+
+      // Supabase sometimes redirects back with an error (e.g. expired link, invalid token)
+      const urlError = params.get('error_description') ?? params.get('error')
+      if (urlError) {
+        clearTimeout(timeout)
+        setError(urlError.replace(/\+/g, ' '))
+        return
+      }
+
+      // PKCE flow (default in supabase-js v2): verification link lands with ?code=XXXX.
+      // We must exchange it for a session — without this call the SDK never fires
+      // onAuthStateChange and the user sees a timeout error.
+      const code = params.get('code')
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+        if (exchangeError) {
+          clearTimeout(timeout)
+          setError(exchangeError.message)
+          return
+        }
+        // Exchange succeeded → onAuthStateChange fires below → navigate() runs there
+        return
+      }
+
+      // Fallback: session already in storage (implicit flow token in hash, or re-visit)
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (session?.user?.email_confirmed_at) {
+        clearTimeout(timeout)
+        navigate('/onboarding/welcome', { replace: true })
+      }
+    }
+
+    // Fires after exchangeCodeForSession resolves with a valid session
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -23,13 +59,7 @@ export function AuthCallbackScreen() {
       }
     })
 
-    // Also check if session already exists (user re-visited the callback URL)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user?.email_confirmed_at) {
-        clearTimeout(timeout)
-        navigate('/onboarding/welcome', { replace: true })
-      }
-    })
+    handleCallback()
 
     return () => {
       clearTimeout(timeout)
