@@ -414,7 +414,7 @@ export function HomeScreen() {
             tone="primary"
             size="sm"
             icon={<PlusIcon />}
-            onClick={() => navigate(`/log?slot=lunch`)}
+            onClick={() => navigate('/log')}
           >
             Log food
           </Btn>

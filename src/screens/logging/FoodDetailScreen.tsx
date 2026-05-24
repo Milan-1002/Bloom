@@ -5,6 +5,7 @@ import { AppBar, Btn, Card, Chip, Ring } from '@/components/ui'
 import { getFoodByFdcId, scaleMacros } from '@/lib/usda'
 import { calculateGL, formatGL, lookupGIForDisplay } from '@/lib/gl'
 import { useLogFood } from '@/hooks/useLogFood'
+import { appendLogSessionItem } from '@/lib/logSession'
 
 type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack'
 
@@ -71,6 +72,7 @@ export function FoodDetailScreen() {
   const initialSlot = (searchParams.get('slot') ?? 'lunch') as MealSlot
   const [slot, setSlot] = useState<MealSlot>(initialSlot)
   const [servingG, setServingG] = useState(100)
+  const [added, setAdded] = useState(false)
 
   const { data: food, isLoading, isError } = useQuery({
     queryKey: ['usda-food', fdcId],
@@ -86,7 +88,7 @@ export function FoodDetailScreen() {
   const gi = food ? lookupGIForDisplay(food.description) : null
 
   const handleLog = async () => {
-    if (!food || !macros) return
+    if (!food || !macros || added) return
     await logFood.mutateAsync({
       fdc_id: food.fdc_id,
       food_name: food.description,
@@ -101,7 +103,20 @@ export function FoodDetailScreen() {
       gi,
       gl,
     })
-    navigate('/home', { replace: true })
+    // Write to session so the search screen can show running totals
+    appendLogSessionItem({
+      food_name: food.description,
+      serving_g: servingG,
+      kcal: macros.kcal,
+      protein_g: macros.protein_g,
+      carbs_g: macros.carbs_g,
+      fat_g: macros.fat_g,
+      fiber_g: macros.fiber_g,
+      gl,
+    })
+    // Show "Added ✓" briefly, then return to the search screen for more foods
+    setAdded(true)
+    setTimeout(() => navigate(-1), 700)
   }
 
   const slotLabel = SLOT_LABELS[slot]
@@ -280,12 +295,14 @@ export function FoodDetailScreen() {
           tone="primary"
           size="lg"
           full
-          disabled={logFood.isPending}
+          disabled={logFood.isPending || added}
           onClick={handleLog}
         >
-          {logFood.isPending
-            ? 'Logging…'
-            : `Add to ${slotLabel} · ${macros?.kcal ?? '—'} kcal`}
+          {added
+            ? `Added to ${slotLabel} ✓`
+            : logFood.isPending
+              ? 'Logging…'
+              : `Add to ${slotLabel} · ${macros?.kcal ?? '—'} kcal`}
         </Btn>
       </div>
     </div>
