@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { type Recipe } from '@/hooks/useRecipes'
+import { type Json } from '@/lib/database.types'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -55,7 +56,7 @@ export function useSavedRecipes() {
         {
           user_id: user!.id,
           recipe_id: recipe.id,
-          recipe: recipe as unknown as Record<string, unknown>,
+          recipe: recipe as unknown as Json,
           source,
         },
         { onConflict: 'user_id,recipe_id' }

@@ -182,6 +182,54 @@ export type Database = {
         }
         Relationships: []
       }
+      library_recipes: {
+        Row: {
+          carbs_g: number
+          category: string
+          created_at: string | null
+          fiber_g: number
+          gl: number
+          id: string
+          ingredients: string[]
+          instructions: string[]
+          kcal: number
+          name: string
+          protein_g: number
+          tags: string[]
+          time_min: number
+        }
+        Insert: {
+          carbs_g: number
+          category: string
+          created_at?: string | null
+          fiber_g: number
+          gl: number
+          id?: string
+          ingredients?: string[]
+          instructions?: string[]
+          kcal: number
+          name: string
+          protein_g: number
+          tags?: string[]
+          time_min: number
+        }
+        Update: {
+          carbs_g?: number
+          category?: string
+          created_at?: string | null
+          fiber_g?: number
+          gl?: number
+          id?: string
+          ingredients?: string[]
+          instructions?: string[]
+          kcal?: number
+          name?: string
+          protein_g?: number
+          tags?: string[]
+          time_min?: number
+        }
+        Relationships: []
+      }
       recipe_suggestions: {
         Row: {
           generated_at: string
@@ -199,6 +247,33 @@ export type Database = {
           generated_at?: string
           id?: string
           recipes?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_recipes: {
+        Row: {
+          id: string
+          recipe: Json
+          recipe_id: string
+          saved_at: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          recipe: Json
+          recipe_id: string
+          saved_at?: string
+          source?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          recipe?: Json
+          recipe_id?: string
+          saved_at?: string
+          source?: string
           user_id?: string
         }
         Relationships: []

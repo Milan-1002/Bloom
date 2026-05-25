@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import type { JSX } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AppBar, Card, Chip } from '@/components/ui'
 import { useFoodSearch } from '@/hooks/useFoodSearch'
