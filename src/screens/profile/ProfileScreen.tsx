@@ -136,6 +136,40 @@ export function ProfileScreen() {
       </div>
 
       <div className="flex flex-col gap-5 px-5 pt-5">
+        {/* Learn / Help */}
+        <div>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-b-ink-3">
+            Learn
+          </p>
+          <button
+            onClick={() => navigate('/help')}
+            className="w-full text-left"
+          >
+            <Card className="flex items-center gap-4 p-4 active:opacity-70 transition-opacity">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-b-primary text-xl">
+                🌸
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-b-ink">Learn about PCOS &amp; Bloom</p>
+                <p className="mt-0.5 text-xs text-b-ink-3">
+                  Plain-English explanations of your metrics, cycle phases, and how everything is calculated
+                </p>
+              </div>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                className="shrink-0 text-b-ink-3"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </Card>
+          </button>
+        </div>
+
         {/* Theme picker */}
         <div>
           <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-b-ink-3">
