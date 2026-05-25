@@ -65,8 +65,8 @@ function AccordionItem({
 
 // ── Prose helpers ──────────────────────────────────────────────────────────────
 
-function P({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-b-ink-2 leading-relaxed mb-3 last:mb-0">{children}</p>
+function P({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <p className={`text-sm text-b-ink-2 leading-relaxed mb-3 last:mb-0 ${className ?? ''}`}>{children}</p>
 }
 
 function H({ children }: { children: React.ReactNode }) {
@@ -134,7 +134,7 @@ const SECTIONS: Section[] = [
             <Bullet icon="🫧">
               Multiple small follicles (fluid-filled sacs) on the ovaries, visible on ultrasound
             </Bullet>
-            <P style={{ marginTop: 12 }}>
+            <P className="mt-3">
               PCOS is very common — it affects around 1 in 10 women of reproductive age. It's a
               chronic condition, but symptoms can be greatly improved through lifestyle, especially
               what you eat.
@@ -254,7 +254,7 @@ const SECTIONS: Section[] = [
             <GLRow label="Excellent" value="🟢" desc="80–100 · You had a great day for insulin balance" />
             <GLRow label="Good" value="🟡" desc="60–79 · Solid choices, minor room to improve" />
             <GLRow label="Needs work" value="🔴" desc="Under 60 · Look for lower-GL swaps tomorrow" />
-            <P style={{ marginTop: 12 }}>
+            <P className="mt-3">
               The score is a guide, not a judgment. One low-scoring day doesn't derail progress —
               consistency over weeks is what matters.
             </P>
