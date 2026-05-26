@@ -7,7 +7,7 @@ stopped_at: ""
 last_updated: "2026-05-26T00:00:00.000Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,16 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** A woman with PCOS can understand how today's food choices affect her insulin balance and symptoms — and receive a personalized, actionable target for the day.
-**Current focus:** Milestone v1.1 — Growth & Polish (defining requirements)
+**Current focus:** Milestone v1.1 — Growth & Polish (roadmap defined, ready to plan Phase 7)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 7 — PWA Brand Icons (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-26 — Milestone v1.1 started
+Status: Roadmap defined — ready to plan
+Last activity: 2026-05-26 — v1.1 roadmap created (Phases 7, 8, 9)
 
-Progress: [░░░░░░░░░░] 0%
+Progress (v1.1): [░░░░░░░░░░] 0%
+
+## Phase List (v1.1)
+
+| Phase | Name | Status |
+|-------|------|--------|
+| 7 | PWA Brand Icons | Not started |
+| 8 | Weekly Insights Card | Not started |
+| 9 | Coach Invite Flow | Not started |
 
 ## Accumulated Context
 
@@ -56,12 +64,20 @@ Progress: [░░░░░░░░░░] 0%
 - Dynamic import pattern for react-pdf — loaded only on Export tap to keep TTI unaffected
 - PDF export: html2canvas captures chartRef div → PNG; react-pdf generates PDF blob; navigator.share() or <a download> fallback
 
+### Decisions (v1.1)
+
+- v1.1 phases continue from v1.0: Phase 7 (PWA Icons), Phase 8 (Insights), Phase 9 (Coach Invite)
+- Coach view is a public page at /coach/:token — no auth guard, server-side token validation (not client RLS bypass)
+- coach_invites table stores token + user_id; Edge Function or Supabase RPC validates token and returns data
+- Insights card surfaces on existing Home/Today dashboard — no new tab or screen
+- PWA icons: SVG master designed in-phase, then rasterized to required PNG sizes (72–512px)
+- Coach view data fetched via a dedicated Edge Function that validates the token server-side before returning any user data
+
 ### Pending Todos (carried from v1.0)
 
 - GI database licensing for gl.ts local table — Sydney University GI database commercial status unclear
 - HIPAA exposure — likely not a covered entity, but requires attorney confirmation before production data stored
 - iOS Safari barcode scan confidence is MEDIUM — fallback to manual entry must be first-class UX
-- Replace placeholder PWA icons (1×1 px) with real Bloom brand icons before production ← addressed in v1.1
 
 ## Deferred Items
 
@@ -72,9 +88,10 @@ Progress: [░░░░░░░░░░] 0%
 | v2 | Coach portal (active management) | Deferred | Init |
 | v2 | Food library enhancements (FOOD-11–13) | Deferred | Init |
 | v2 | Full coach portal with client management | Deferred | Init |
+| v2 | Deeper insights correlation engine (INSG-03) | Deferred | v1.1 scope |
 
 ## Session Continuity
 
 Last session: 2026-05-26T00:00:00.000Z
-Stopped at: Milestone v1.1 started — requirements defined, roadmap pending
-Next action: Roadmapper agent creating ROADMAP.md
+Stopped at: v1.1 roadmap created — Phases 7, 8, 9 defined with success criteria
+Next action: /gsd:plan-phase 7 — PWA Brand Icons

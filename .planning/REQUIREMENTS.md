@@ -170,14 +170,16 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PWA-01 | TBD | Planned |
-| INSG-01 | TBD | Planned |
-| INSG-02 | TBD | Planned |
-| COACH-01 | TBD | Planned |
-| COACH-02 | TBD | Planned |
-| COACH-03 | TBD | Planned |
-| COACH-04 | TBD | Planned |
-| COACH-05 | TBD | Planned |
+| PWA-01 | Phase 7 — PWA Brand Icons | Planned |
+| INSG-01 | Phase 8 — Weekly Insights Card | Planned |
+| INSG-02 | Phase 8 — Weekly Insights Card | Planned |
+| COACH-01 | Phase 9 — Coach Invite Flow | Planned |
+| COACH-02 | Phase 9 — Coach Invite Flow | Planned |
+| COACH-03 | Phase 9 — Coach Invite Flow | Planned |
+| COACH-04 | Phase 9 — Coach Invite Flow | Planned |
+| COACH-05 | Phase 9 — Coach Invite Flow | Planned |
+
+**v1.1 coverage:** 8 requirements, all 8 mapped ✓
 
 ### v1.0
 
@@ -197,9 +199,9 @@
 | RPT-01–05 | Phase 6 — Reports | Complete |
 
 **v1.0 coverage:** 50 requirements, all 50 mapped and shipped ✓
-**v1.1 coverage:** 8 requirements → TBD (roadmap pending)
 
 ---
 
 *Requirements defined: 2026-05-18*
 *v1.1 scope added: 2026-05-26*
+*v1.1 traceability updated: 2026-05-26*

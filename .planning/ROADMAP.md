@@ -145,3 +145,73 @@ Plans:
 | 4. AI Targets — Claude Edge Function + Insulin Balance | 2/2 | Complete | - |
 | 5. Cycle-Synced Nutrition Targets | 3/3 | Complete | 2026-05-20 |
 | 6. Automated "Doctor-Ready" Reports | 3/3 | Complete | 2026-05-23 |
+
+---
+
+---
+
+# Roadmap: Bloom — Milestone v1.1 Growth & Polish
+
+**Milestone 2 — v1.1 Growth & Polish**
+*Goal: Make Bloom shareable with real users — polished PWA presence, weekly AI insights on the dashboard, and a coach invite flow for read-only access.*
+
+---
+
+## Phases
+
+- [ ] **Phase 7: PWA Brand Icons** - Design Bloom SVG icon, generate all required PNG sizes, update manifest + favicon, replace placeholder icons
+- [ ] **Phase 8: Weekly Insights Card** - AI-generated weekly insights on the Home dashboard: food↔symptom correlation and cycle phase preview
+- [ ] **Phase 9: Coach Invite Flow** - Token-based coach invite from Profile Settings, public /coach/:token read-only view with food logs, macro averages, symptom trends, and weight chart
+
+---
+
+## Phase Details
+
+### Phase 7: PWA Brand Icons
+**Goal:** Users see a real Bloom brand icon when they install the app or add it to their home screen — replacing the 1x1 pixel placeholder icons that currently ship with the PWA.
+**Depends on:** Phase 6 (v1.0 complete)
+**Requirements:** PWA-01
+**Success Criteria** (what must be TRUE):
+  1. When a user installs the Bloom PWA on their phone, the home screen icon shows the Bloom brand mark (not a blank or broken icon)
+  2. The installed app icon renders crisply at all standard sizes — small (72px), medium (192px), and large (512px) — with no pixelation or stretching
+  3. The browser tab favicon matches the Bloom brand mark
+  4. The PWA manifest references all required icon sizes and the app passes Chrome's installability checklist without icon warnings
+**Plans:** TBD
+**UI hint**: yes
+
+### Phase 8: Weekly Insights Card
+**Goal:** Users see a weekly insights card on their existing Home dashboard that surfaces the most meaningful food-symptom correlation from the past 7 days and their current cycle phase context — without navigating away from the dashboard.
+**Depends on:** Phase 6 (v1.0 complete — food logs, symptom logs, and cycle data all exist)
+**Requirements:** INSG-01, INSG-02
+**Success Criteria** (what must be TRUE):
+  1. A user who has logged at least 7 days of food and symptoms sees a "Weekly Insights" card on the Home dashboard showing a plain-language food-to-symptom correlation (e.g., "On days you exceeded your GL target, bloating was 40% higher")
+  2. The insights card shows the user's current cycle phase with a brief plain-language note about what to expect in the upcoming phase (e.g., "Luteal phase starts in 3 days — energy dips and cravings are normal")
+  3. The insights card updates each week with new data — a user who has used the app for multiple weeks sees different insights each week
+  4. When fewer than 7 days of data exist, the card shows a friendly prompt to keep logging rather than an empty or broken state
+**Plans:** TBD
+**UI hint**: yes
+
+### Phase 9: Coach Invite Flow
+**Goal:** A user can generate a shareable tokenized link from Profile Settings and send it to their nutrition coach; the coach opens the link in any browser — with no login or Supabase account — and sees a read-only view of the user's food logs, macro averages, symptom trends, and weight chart for the past 30 days.
+**Depends on:** Phase 6 (v1.0 complete — food logs, symptoms, and weight data exist)
+**Requirements:** COACH-01, COACH-02, COACH-03, COACH-04, COACH-05
+**Success Criteria** (what must be TRUE):
+  1. A user can tap "Generate Coach Link" in Profile Settings and receive a unique tokenized URL they can copy and share — no email or account is required from the coach
+  2. A coach who opens the tokenized URL in a browser (with no Supabase account or login) sees a read-only view of the user's food logs for the past 30 days
+  3. The coach view displays 7-day and 30-day macro averages (protein, fiber, glycemic load, calories) so the coach can see macro patterns at a glance
+  4. The coach view displays symptom trends over time (energy, mood, bloating, skin, sleep) as a chart or scored timeline
+  5. The coach view includes a 7-day rolling average weight trend chart matching the same rolling-average logic used on the user's own dashboard
+**Plans:** TBD
+**UI hint**: yes
+
+---
+
+## Progress (v1.1)
+
+**Execution Order:** 7 → 8 → 9
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 7. PWA Brand Icons | 0/TBD | Not started | - |
+| 8. Weekly Insights Card | 0/TBD | Not started | - |
+| 9. Coach Invite Flow | 0/TBD | Not started | - |
