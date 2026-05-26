@@ -472,17 +472,15 @@ VitePWA({
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Icon color: purple vs. slate navy**
-   - What we know: The existing `favicon.svg` uses `#863bff` (violet/purple). The design tokens define `--b-primary` as `#1F3A4D` (slate navy). The app manifest has `theme_color: '#1F3A4D'`.
-   - What's unclear: Which color should the PWA icon use? The purple mark reads as a distinct visual brand; the slate navy is the primary app color. These two choices produce very different-looking icons.
-   - Recommendation: Default to reproducing the existing Bloom mark (`#863bff` on a `#1F3A4D` or white background) since it's already established as the favicon. If the user wants a different design, this is a design decision to make before plan execution, not during.
+1. **Icon color: purple vs. slate navy** ✓ RESOLVED
+   - **Decision:** Use slate navy `#1F3A4D` background with white `#FFFFFF` Bloom mark — matches `--b-primary` design token and `theme_color` in manifest.
+   - Rationale: User confirmed slate navy to align the PWA icon with the app's primary brand color.
 
-2. **Icon sizes: strict vs. minimal**
-   - What we know: PWA-01 specifies 72, 96, 128, 144, 152, 192, 384, 512px. The `minimal-2023` preset generates 64, 192, 512, maskable-512, apple-180. Chrome's installability check only requires 192 and 512.
-   - What's unclear: Is the full PWA-01 size list a hard requirement or a "nice to have"? The 72/96/128/144/152/384 sizes benefit older Android versions and some browser UIs.
-   - Recommendation: Implement all PWA-01 sizes — the custom sharp script is ~15 lines and the extra files are small. The requirement says "all standard PWA sizes" so include them all.
+2. **Icon sizes: strict vs. minimal** ✓ RESOLVED
+   - **Decision:** Implement ALL 8 PWA-01 sizes (72, 96, 128, 144, 152, 192, 384, 512px) plus the 64px from the minimal-2023 preset.
+   - Rationale: User confirmed full size list; custom sharp script is ~15 lines and provides coverage across all Android/browser UI resolutions.
 
 ---
 
