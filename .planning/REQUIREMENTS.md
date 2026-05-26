@@ -10,7 +10,7 @@
 
 ### PWA Brand Icons
 
-- [ ] **PWA-01**: App installs with real Bloom brand icons in all standard PWA sizes (72, 96, 128, 144, 152, 192, 384, 512px PNG) — replaces 1×1px placeholder icons
+- [x] **PWA-01**: App installs with real Bloom brand icons in all standard PWA sizes (72, 96, 128, 144, 152, 192, 384, 512px PNG) — replaces 1×1px placeholder icons
 
 ### Weekly Insights
 
