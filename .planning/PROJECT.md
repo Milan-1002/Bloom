@@ -8,29 +8,42 @@ Bloom is a PCOS-aware nutrition companion for women. Users log meals, track macr
 
 A woman with PCOS can understand how today's food choices affect her insulin balance and symptoms — and receive a personalized, actionable target for the day.
 
+## Current Milestone: v1.1 Growth & Polish
+
+**Goal:** Make Bloom shareable with real users — polished PWA presence, weekly AI insights on the dashboard, and a coach invite flow for read-only access.
+
+**Target features:**
+- Real PWA icons — create Bloom brand icon, generate all required sizes (72×72 → 512×512), replace 1×1px placeholders
+- Weekly Insights card — Claude-generated weekly summary on the Home dashboard (food↔symptom correlations, cycle phase patterns, habit highlights)
+- Coach invite flow — tokenized shareable link; coach opens in browser (no account required) and sees read-only view of food logs, macros, symptoms, and weight
+
 ## Requirements
 
 ### Validated
 
 (None yet — ship to validate)
 
-### Active
+### Active (v1.1)
 
-- [ ] User can sign up, log in, and stay authenticated across sessions
-- [ ] User can complete onboarding (profile: age, height, weight, PCOS type, goals)
-- [ ] User can log period start date; app auto-calculates cycle day and phase
-- [ ] User can search USDA food database and log meals with macros
-- [ ] User can scan a product barcode to auto-fill food details
-- [ ] User can view today's dashboard (Insulin Balance score, PCOS macros vs. targets, meals, symptoms, weight)
-- [ ] AI (Claude API) generates personalized macro targets and Insulin Balance score from user profile + cycle phase
-- [ ] User can log symptoms (energy, mood, sleep, bloating, skin) with 1–5 scale
-- [ ] User can log daily weight
-- [ ] User can view weekly macro and glycemic load trends
-- [ ] User can view weekly insights (correlations between symptoms, food, and cycle phase)
-- [ ] User can invite a coach via shareable link; coach gets read-only view of food logs, macros, symptoms, and weight
-- [ ] User can view coach's protocol (meal templates, habit targets) in the app
-- [ ] User can browse a recipe library filtered by PCOS-friendly criteria
-- [ ] User can configure profile, theme (slate/warm/sage), and notification preferences
+- [ ] App installs as a PWA with real Bloom brand icons (all standard sizes)
+- [ ] User sees a weekly AI-generated insights card on the Home dashboard
+- [ ] User can invite a coach via a shareable tokenized link (no coach account required)
+- [ ] Coach can view user's food logs, macros, symptoms, and weight via the shared link (read-only, no login)
+
+### Validated (v1.0 — shipped)
+
+- [x] User can sign up, log in, and stay authenticated across sessions (AUTH)
+- [x] User can complete onboarding (profile: age, height, weight, PCOS type, goals) (ONBD)
+- [x] User can log period start date; app auto-calculates cycle day and phase (CYCL)
+- [x] User can search USDA food database and log meals with macros (FOOD)
+- [x] User can scan a product barcode to auto-fill food details (FOOD)
+- [x] User can view today's dashboard (Insulin Balance score, PCOS macros vs. targets, meals, symptoms, weight) (DASH)
+- [x] AI (Claude API) generates personalized macro targets and Insulin Balance score from user profile + cycle phase (AI)
+- [x] User can log symptoms (energy, mood, sleep, bloating, skin) with 1–5 scale (SYMPT)
+- [x] User can log daily weight (WGHT)
+- [x] Cycle phase adjusts GL/macro targets dynamically; luteal craving interception shown (CYCL)
+- [x] 30/60/90-day doctor-ready reports with GL/symptom chart and PDF export (RPT)
+- [x] User can configure profile, theme (slate/warm/sage) (PROF)
 
 ### Out of Scope
 
@@ -90,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-18 after initialization*
+*Last updated: 2026-05-26 — milestone v1.1 Growth & Polish started*
