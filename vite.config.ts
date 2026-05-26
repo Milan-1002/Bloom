@@ -11,6 +11,14 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       strategies: 'generateSW',
+      includeAssets: [
+        'favicon.svg', 'favicon.ico',
+        'apple-touch-icon-180x180.png',
+        'pwa-64x64.png', 'pwa-72x72.png', 'pwa-96x96.png',
+        'pwa-128x128.png', 'pwa-144x144.png', 'pwa-152x152.png',
+        'pwa-192x192.png', 'pwa-384x384.png', 'pwa-512x512.png',
+        'maskable-icon-512x512.png',
+      ],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
@@ -35,8 +43,16 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         icons: [
-          { src: '/icons/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+          { src: '/pwa-64x64.png',             sizes: '64x64',   type: 'image/png' },
+          { src: '/pwa-72x72.png',             sizes: '72x72',   type: 'image/png' },
+          { src: '/pwa-96x96.png',             sizes: '96x96',   type: 'image/png' },
+          { src: '/pwa-128x128.png',           sizes: '128x128', type: 'image/png' },
+          { src: '/pwa-144x144.png',           sizes: '144x144', type: 'image/png' },
+          { src: '/pwa-152x152.png',           sizes: '152x152', type: 'image/png' },
+          { src: '/pwa-192x192.png',           sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-384x384.png',           sizes: '384x384', type: 'image/png' },
+          { src: '/pwa-512x512.png',           sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
     }),
