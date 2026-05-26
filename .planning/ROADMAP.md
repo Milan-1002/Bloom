@@ -176,7 +176,11 @@ Plans:
   2. The installed app icon renders crisply at all standard sizes — small (72px), medium (192px), and large (512px) — with no pixelation or stretching
   3. The browser tab favicon matches the Bloom brand mark
   4. The PWA manifest references all required icon sizes and the app passes Chrome's installability checklist without icon warnings
-**Plans:** TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 07-01-PLAN.md — Icon source SVG, asset generation (all PNG sizes), manifest + index.html fixes
+
 **UI hint**: yes
 
 ### Phase 8: Weekly Insights Card
@@ -212,6 +216,6 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 7. PWA Brand Icons | 0/TBD | Not started | - |
+| 7. PWA Brand Icons | 0/1 | Not started | - |
 | 8. Weekly Insights Card | 0/TBD | Not started | - |
 | 9. Coach Invite Flow | 0/TBD | Not started | - |
